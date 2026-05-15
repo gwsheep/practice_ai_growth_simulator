@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>개발자 성장 시뮬레이터</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <script defer th:src="@{/js/dashboard.js}"></script>
+</head>
+<body>
+<main class="container page-shell py-4">
+    <nav class="top-nav">
+        <div class="brand-mark">
+            <span class="office-character brand-mascot" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </span>
+            <span>개발자 성장 시뮬레이터</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/growth-categories}">성장 항목</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedules}">일정</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/daily-reviews}">회고</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/weekly-reports}">주간 리포트</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/monsters}">몬스터</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/quests}">퀘스트 목록</a>
+            <a class="btn btn-primary btn-sm" th:href="@{/quests/new}">퀘스트 추가</a>
+        </div>
+    </nav>
+
+    <section class="mascot-zone mb-4"
+             data-mascot-zone
+             th:attr="data-success=${completedMessage != null},data-level-up=${levelUp == true}">
+        <div class="mascot-stage">
+            <div class="office-character mascot-character" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </div>
+        </div>
+        <div class="mascot-content">
+            <p class="mascot-speech mb-2" th:text="${characterMessage}">오늘은 작은 퀘스트 하나만 깨도 충분해요.</p>
+            <h1 class="h3 mb-1" th:text="${profile.nickname}">devgwon</h1>
+            <p class="text-muted mb-0">
+                <span th:text="${profile.characterName}">백둥이</span>
+                <span> · </span>
+                <span th:text="${profile.title}">주니어 백엔드</span>
+            </p>
+        </div>
+    </section>
+
+    <section th:if="${completedMessage}" class="result-card mb-4" data-result-card>
+        <div>
+            <span class="result-card__eyebrow">퀘스트 클리어</span>
+            <h2 class="result-card__title" th:text="${completedMessage}">퀘스트를 완료했습니다.</h2>
+            <div class="result-card__rewards">
+                <span class="reward-chip" th:text="'EXP +' + ${gainedExp}">EXP +10</span>
+                <span class="reward-chip" th:text="${gainedStatName} + ' +' + ${gainedStatAmount}">업무 +1</span>
+                <span th:if="${levelUp == true}" class="reward-chip reward-chip--level">LEVEL UP</span>
+            </div>
+        </div>
+    </section>
+
+    <div th:if="${noticeMessage != null and completedMessage == null}" class="alert alert-success" th:text="${noticeMessage}"></div>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-lg-4">
+            <div class="soft-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="section-title">레벨</h2>
+                    <span class="level-badge" th:text="'Lv. ' + ${profile.level}">Lv. 1</span>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>EXP</span>
+                    <span th:text="${profile.exp} + ' / 100'">0 / 100</span>
+                </div>
+                <div class="progress exp-progress" role="progressbar" aria-label="EXP progress">
+                    <div class="progress-bar" th:style="'width: ' + ${profile.expProgressPercent} + '%'"></div>
+                </div>
+                <p class="text-muted small mb-0 mt-2" th:text="'다음 레벨까지 ' + ${profile.expToNextLevel} + ' EXP'">다음 레벨까지 100 EXP</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+            <div class="soft-card h-100">
+                <h2 class="section-title mb-2">성장 지도 <small>카테고리별 성장 항목</small></h2>
+                <p class="text-muted small mb-0">퀘스트를 완료하면 연결된 중분류 EXP가 쌓이고, 100 EXP마다 해당 항목 레벨이 올라갑니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="growth-summary-grid mb-4">
+        <article class="growth-summary-card">
+            <span>성장 영역</span>
+            <strong th:text="${dashboard.growthSummary.categoryCount}">12</strong>
+            <small>대분류</small>
+        </article>
+        <article class="growth-summary-card">
+            <span>세부 항목</span>
+            <strong th:text="${dashboard.growthSummary.subCategoryCount}">74</strong>
+            <small>중분류</small>
+        </article>
+        <article class="growth-summary-card">
+            <span>누적 성장 EXP</span>
+            <strong th:text="${dashboard.growthSummary.totalGrowthExp}">0</strong>
+            <small>Growth EXP</small>
+        </article>
+        <article class="growth-summary-card">
+            <span>가장 성장한 항목</span>
+            <strong class="growth-summary-card__text" th:text="${dashboard.growthSummary.topSubCategoryName}">아직 없음</strong>
+            <small th:text="${dashboard.growthSummary.topSubCategoryExp} + ' EXP'">0 EXP</small>
+        </article>
+        <article class="growth-summary-card">
+            <span>최근 성장</span>
+            <strong class="growth-summary-card__text" th:text="${dashboard.growthSummary.recentGrowthName}">아직 없음</strong>
+            <small>최근 GrowthLog</small>
+        </article>
+    </section>
+
+    <section class="dashboard-split mb-4">
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">몬스터 전투 <small>불안과 장애를 작게 공격하기</small></h2>
+                <a class="btn btn-outline-danger btn-sm" th:href="@{/monsters}">몬스터 보기</a>
+            </div>
+            <div class="growth-summary-grid growth-summary-grid--compact mb-3">
+                <article class="growth-summary-card">
+                    <span>전투 중</span>
+                    <strong th:text="${dashboard.monsterSummary.activeMonsterCount}">0</strong>
+                    <small>마리</small>
+                </article>
+                <article class="growth-summary-card">
+                    <span>처치 직전</span>
+                    <strong class="growth-summary-card__text"
+                            th:text="${dashboard.monsterSummary.almostDefeatedMonster == null ? '아직 없음' : dashboard.monsterSummary.almostDefeatedMonster.name}">아직 없음</strong>
+                    <small th:text="${dashboard.monsterSummary.almostDefeatedMonster == null ? 'HP 기록 없음' : dashboard.monsterSummary.almostDefeatedMonster.currentHp + ' HP'}">HP</small>
+                </article>
+            </div>
+            <p class="text-muted small mb-0" th:if="${dashboard.monsterSummary.activeMonsterCount > 0}">
+                지금 상대 중인 몬스터가 있어요. 오늘 10 데미지만 넣어볼까요?
+            </p>
+            <p class="text-muted small mb-0" th:unless="${dashboard.monsterSummary.activeMonsterCount > 0}">
+                지금 전투 중인 몬스터가 없어요. 요즘 막히는 문제를 등록해볼까요?
+            </p>
+        </article>
+
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">최근 처치 <small>해결한 문제</small></h2>
+                <a class="btn btn-primary btn-sm" th:href="@{/monsters/new}">몬스터 등록</a>
+            </div>
+            <div th:if="${dashboard.monsterSummary.recentDefeatedMonster == null}" class="empty-state">
+                아직 처치한 몬스터가 없습니다.
+            </div>
+            <div class="mini-list" th:if="${dashboard.monsterSummary.recentDefeatedMonster != null}">
+                <div class="mini-list__item">
+                    <div>
+                        <strong th:text="${dashboard.monsterSummary.recentDefeatedMonster.name}">레거시 코드</strong>
+                        <p th:text="${dashboard.monsterSummary.recentDefeatedMonster.typeLabel}">레거시 코드</p>
+                        <span th:text="${dashboard.monsterSummary.recentDefeatedMonster.relatedSubCategoryDisplayName}">API 설계</span>
+                    </div>
+                    <em th:text="${dashboard.monsterSummary.recentDefeatedMonster.rewardExp} + ' EXP'">0 EXP</em>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="soft-card mb-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+            <h2 class="section-title">이번 주 리포트 <small>성장 기록 요약</small></h2>
+            <a class="btn btn-outline-primary btn-sm" th:href="@{/weekly-reports}">리포트 보기</a>
+        </div>
+        <div class="growth-summary-grid growth-summary-grid--compact">
+            <article class="growth-summary-card">
+                <span>완료 Quest</span>
+                <strong th:text="${dashboard.weeklyReportSummary.completedQuestCount}">0</strong>
+                <small>이번 주</small>
+            </article>
+            <article class="growth-summary-card">
+                <span>획득 EXP</span>
+                <strong th:text="${dashboard.weeklyReportSummary.totalGainedExp}">0</strong>
+                <small>GrowthLog 기준</small>
+            </article>
+            <article class="growth-summary-card">
+                <span>주간 상태</span>
+                <strong class="growth-summary-card__text"
+                        th:text="${dashboard.weeklyReportSummary.hasWeeklyActivity ? '기록 쌓임' : '기록 대기'}">기록 대기</strong>
+                <small>월요일~일요일</small>
+            </article>
+        </div>
+    </section>
+
+    <section class="dashboard-split mb-4">
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">오늘 일정 <small>계획한 성장 루틴</small></h2>
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedules}">일정 보기</a>
+            </div>
+            <div class="growth-summary-grid growth-summary-grid--compact mb-3">
+                <article class="growth-summary-card">
+                    <span>오늘 예정</span>
+                    <strong th:text="${dashboard.todayScheduleCount}">0</strong>
+                    <small>개</small>
+                </article>
+                <article class="growth-summary-card">
+                    <span>이번 주 예정</span>
+                    <strong th:text="${dashboard.weekScheduleCount}">0</strong>
+                    <small>개</small>
+                </article>
+            </div>
+            <div th:if="${#lists.isEmpty(dashboard.todaySchedules)}" class="empty-state">
+                오늘 예정된 일정이 없습니다.
+            </div>
+            <div class="mini-list" th:unless="${#lists.isEmpty(dashboard.todaySchedules)}">
+                <div class="mini-list__item" th:each="schedule : ${dashboard.todaySchedules}">
+                    <div>
+                        <strong th:text="${schedule.title}">일정 제목</strong>
+                        <p>
+                            <span th:text="${schedule.typeLabel}">공부</span>
+                            <span> · </span>
+                            <span th:text="${schedule.subCategoryDisplayName}">API 설계</span>
+                        </p>
+                    </div>
+                    <em th:text="${schedule.timeText}">19:00</em>
+                </div>
+            </div>
+        </article>
+
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">계획에서 퀘스트로 <small>이번 MVP의 연결 지점</small></h2>
+                <a class="btn btn-primary btn-sm" th:href="@{/schedules/new}">일정 추가</a>
+            </div>
+            <p class="text-muted small mb-0">
+                일정은 공부 계획을 잡는 공간입니다. EXP와 GrowthLog는 기존처럼 Quest 완료 시에만 반영됩니다.
+            </p>
+        </article>
+    </section>
+
+    <section class="dashboard-split mb-4">
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">오늘 회고 <small>3분 기록 루틴</small></h2>
+                <a th:if="${dashboard.todayReviewWritten}"
+                   class="btn btn-outline-secondary btn-sm"
+                   th:href="@{/daily-reviews/{id}(id=${dashboard.todayReviewId})}">회고 보기</a>
+                <a th:unless="${dashboard.todayReviewWritten}"
+                   class="btn btn-primary btn-sm"
+                   th:href="@{/daily-reviews/new}">회고 작성</a>
+            </div>
+            <p class="text-muted small mb-0" th:if="${dashboard.todayReviewWritten}">
+                오늘의 회고가 저장되어 있습니다. 필요하면 조금만 다듬어 주세요.
+            </p>
+            <p class="text-muted small mb-0" th:unless="${dashboard.todayReviewWritten}">
+                오늘의 회고가 아직 없어요. 3분만 기록해볼까요?
+            </p>
+        </article>
+
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">최근 회고 <small>하루의 흔적</small></h2>
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/daily-reviews}">회고 목록</a>
+            </div>
+            <div th:if="${#lists.isEmpty(dashboard.recentDailyReviews)}" class="empty-state">
+                아직 작성한 회고가 없습니다.
+            </div>
+            <div class="mini-list" th:unless="${#lists.isEmpty(dashboard.recentDailyReviews)}">
+                <div class="mini-list__item" th:each="review : ${dashboard.recentDailyReviews}">
+                    <div>
+                        <strong th:text="${review.reviewDateText}">05.14</strong>
+                        <p th:text="${review.learnedSummary}">회고 요약</p>
+                        <span th:text="${review.subCategoryDisplayName}">API 설계</span>
+                    </div>
+                    <em th:text="${review.moodScore} + '점'">3점</em>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="growth-map mb-4">
+        <details class="growth-category" th:each="growthCategory, categoryStat : ${growthCategories}" th:open="${categoryStat.index < 2}">
+            <summary class="growth-category__summary">
+                <span>
+                    <strong th:text="${growthCategory.displayName}">백엔드</strong>
+                    <small th:text="${growthCategory.description}">API 설계, 트랜잭션</small>
+                </span>
+                <span class="growth-category__count"
+                      th:text="${growthCategory.subCategoryCount} + '개 · Lv.' + ${growthCategory.averageLevel} + ' · ' + ${growthCategory.totalExp} + ' EXP'">6개 항목</span>
+            </summary>
+
+            <div class="growth-sub-grid">
+                <article class="growth-sub-card" th:each="subCategory : ${growthCategory.subCategories}">
+                    <div class="growth-sub-card__top">
+                        <strong th:text="${subCategory.displayName}">API 설계</strong>
+                        <span class="growth-level-badge" th:text="'Lv. ' + ${subCategory.level}">Lv. 1</span>
+                    </div>
+                    <p th:text="${subCategory.description}">API 설계 성장 항목</p>
+                    <div class="growth-exp-row">
+                        <span>EXP</span>
+                        <span th:text="${subCategory.currentLevelExp} + ' / 100'">0 / 100</span>
+                    </div>
+                    <div class="progress growth-progress" role="progressbar" aria-label="Growth EXP progress">
+                        <div class="progress-bar" th:style="'width: ' + ${subCategory.progressPercent} + '%'"></div>
+                    </div>
+                    <div class="growth-sub-card__foot">
+                        <span th:text="'누적 ' + ${subCategory.totalExp} + ' EXP'">누적 0 EXP</span>
+                        <span th:text="'다음 Lv.까지 ' + ${subCategory.expToNextLevel} + ' EXP'">다음 Lv.까지 100 EXP</span>
+                    </div>
+                </article>
+            </div>
+        </details>
+    </section>
+
+    <section class="dashboard-split mb-4">
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">최근 성장 로그 <small>방금 쌓인 경험치</small></h2>
+            </div>
+            <div th:if="${#lists.isEmpty(dashboard.recentGrowthLogs)}" class="empty-state">
+                아직 성장 로그가 없습니다.
+            </div>
+            <div class="mini-list" th:unless="${#lists.isEmpty(dashboard.recentGrowthLogs)}">
+                <div class="mini-list__item" th:each="log : ${dashboard.recentGrowthLogs}">
+                    <div>
+                        <strong th:text="${log.subCategoryDisplayName}">API 설계</strong>
+                        <p th:text="${log.message}">성장 메시지</p>
+                        <span th:text="${log.categoryDisplayName}">백엔드</span>
+                    </div>
+                    <em th:text="'+' + ${log.expGained} + ' EXP'">+10 EXP</em>
+                </div>
+            </div>
+        </article>
+
+        <article class="soft-card">
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                <h2 class="section-title">최근 완료 Quest <small>클리어 기록</small></h2>
+            </div>
+            <div th:if="${#lists.isEmpty(dashboard.recentCompletedQuests)}" class="empty-state">
+                아직 완료한 퀘스트가 없습니다.
+            </div>
+            <div class="mini-list" th:unless="${#lists.isEmpty(dashboard.recentCompletedQuests)}">
+                <div class="mini-list__item" th:each="quest : ${dashboard.recentCompletedQuests}">
+                    <div>
+                        <strong th:text="${quest.title}">퀘스트 제목</strong>
+                        <p>
+                            <span th:text="${quest.categoryDisplayName}">백엔드</span>
+                            <span> · </span>
+                            <span th:text="${quest.subCategoryDisplayName}">API 설계</span>
+                        </p>
+                    </div>
+                    <em th:text="'+' + ${quest.expReward} + ' EXP'">+10 EXP</em>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="soft-card">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+            <h2 class="section-title">최근 퀘스트 <small>완료하면 EXP와 성장 항목이 올라갑니다</small></h2>
+            <a class="btn btn-primary btn-sm" th:href="@{/quests/new}">퀘스트 추가</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(quests)}" class="empty-state">
+            아직 등록된 퀘스트가 없습니다.
+        </div>
+
+        <div class="quest-list" th:unless="${#lists.isEmpty(quests)}">
+            <article class="quest-item" th:each="quest : ${quests}">
+                <div class="quest-main">
+                    <strong class="quest-title" th:text="${quest.title}">퀘스트 제목</strong>
+                    <div class="quest-meta mb-1">
+                        <span class="badge badge-soft" th:text="${quest.categoryDisplayName}">백엔드</span>
+                        <span class="badge badge-soft" th:text="${quest.subCategoryDisplayName}">API 설계</span>
+                        <span class="badge text-bg-warning" th:text="${quest.difficultyLabel}">쉬움</span>
+                        <span class="badge badge-exp" th:text="${quest.expReward} + ' EXP'">10 EXP</span>
+                        <span class="badge text-bg-light" th:text="${quest.statusLabel}">진행 전</span>
+                    </div>
+                    <p class="text-muted small mb-1" th:text="${quest.description}">설명</p>
+                </div>
+                <div class="quest-actions">
+                    <form th:if="${quest.ready}" th:action="@{/quests/{id}/complete(id=${quest.id})}" method="post">
+                        <button class="btn btn-outline-success btn-sm" type="submit">완료</button>
+                    </form>
+                    <span th:unless="${quest.ready}" class="badge text-bg-success">완료됨</span>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>일정 등록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script defer th:src="@{/js/quest-form.js}"></script>
+</head>
+<body>
+<main class="container page-shell py-4">
+    <nav class="top-nav">
+        <div class="brand-mark">
+            <span class="office-character brand-mascot" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </span>
+            <span th:text="${editMode ? '일정 수정' : '일정 등록'}">일정 등록</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/dashboard}">대시보드</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedule-types}">타입 관리</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedules}">목록</a>
+        </div>
+    </nav>
+
+    <section class="hero-panel mb-4">
+        <div class="office-character" aria-hidden="true">
+            <span class="office-character__body"></span>
+            <span class="office-character__shirt"></span>
+            <span class="office-character__tie"></span>
+            <span class="office-character__badge">백</span>
+            <span class="office-character__head"></span>
+            <span class="office-character__hair"></span>
+            <span class="office-character__eye office-character__eye--left"></span>
+            <span class="office-character__eye office-character__eye--right"></span>
+            <span class="office-character__mouth"></span>
+        </div>
+        <div>
+            <p class="speech-bubble mb-2">일정은 계획이고, 성장은 퀘스트 완료로 기록돼요.</p>
+            <h1 class="h3 mb-1" th:text="${editMode ? '일정 다듬기' : '새 일정 만들기'}">새 일정 만들기</h1>
+            <p class="text-muted mb-0">성장 항목은 선택 사항입니다. 나중에 Quest로 연결할 수 있도록 남겨둡니다.</p>
+        </div>
+    </section>
+
+    <section class="soft-card form-panel">
+        <form class="quest-form"
+              th:action="${editMode ? '/schedules/' + schedule.id + '/edit' : '/schedules'}"
+              th:object="${scheduleForm}"
+              method="post">
+            <div>
+                <label class="form-label" for="title">일정 제목</label>
+                <input class="form-control" id="title" type="text" th:field="*{title}" required maxlength="120"
+                       placeholder="예: 코딩테스트 2문제 풀기">
+            </div>
+
+            <div>
+                <label class="form-label" for="description">설명</label>
+                <textarea class="form-control" id="description" th:field="*{description}" rows="4"
+                          placeholder="준비할 내용이나 메모를 짧게 적어주세요."></textarea>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="scheduleType">일정 타입</label>
+                    <select class="form-select" id="scheduleType" th:field="*{scheduleTypeId}" required>
+                        <option th:each="scheduleType : ${scheduleTypes}"
+                                th:value="${scheduleType.id}"
+                                th:text="${scheduleType.name}">공부</option>
+                    </select>
+                    <p class="text-muted small mb-0 mt-1" th:if="${#lists.isEmpty(scheduleTypes)}">
+                        먼저 일정 타입을 추가해 주세요.
+                    </p>
+                </div>
+                <div class="col-12 col-md-6" th:if="${editMode}">
+                    <label class="form-label" for="status">상태</label>
+                    <select class="form-select" id="status" th:field="*{status}">
+                        <option th:each="scheduleStatus : ${scheduleStatuses}"
+                                th:value="${scheduleStatus}"
+                                th:text="${scheduleStatus.label}">예정</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="startDate">시작 일시</label>
+                    <div class="schedule-time-picker">
+                        <input class="form-control schedule-time-picker__date" id="startDate" type="date"
+                               th:field="*{startDate}" required>
+                        <input class="form-control schedule-time-picker__unit" id="startHour" type="number"
+                               th:field="*{startHour}" min="0" max="23" step="1" inputmode="numeric" required
+                               aria-label="시작 시">
+                        <span>시</span>
+                        <input class="form-control schedule-time-picker__unit" id="startMinute" type="number"
+                               th:field="*{startMinute}" min="0" max="59" step="5" inputmode="numeric" required
+                               aria-label="시작 분">
+                        <span>분</span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="endDate">종료 일시</label>
+                    <div class="schedule-time-picker">
+                        <input class="form-control schedule-time-picker__date" id="endDate" type="date"
+                               th:field="*{endDate}">
+                        <input class="form-control schedule-time-picker__unit" id="endHour" type="number"
+                               th:field="*{endHour}" min="0" max="23" step="1" inputmode="numeric"
+                               aria-label="종료 시">
+                        <span>시</span>
+                        <input class="form-control schedule-time-picker__unit" id="endMinute" type="number"
+                               th:field="*{endMinute}" min="0" max="59" step="5" inputmode="numeric"
+                               aria-label="종료 분">
+                        <span>분</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="categoryId">성장 대분류</label>
+                    <select class="form-select" id="categoryId" data-category-select>
+                        <option value="">선택 안 함</option>
+                        <option th:each="category : ${growthCategories}"
+                                th:value="${category.id}"
+                                th:text="${category.displayName}">백엔드</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="relatedGrowthSubCategoryId">성장 중분류</label>
+                    <select class="form-select" id="relatedGrowthSubCategoryId"
+                            th:field="*{relatedGrowthSubCategoryId}" data-sub-category-select>
+                        <option value="">선택 안 함</option>
+                        <option th:each="subCategory : ${growthSubCategories}"
+                                th:value="${subCategory.id}"
+                                th:attr="data-category-id=${subCategory.category.id}"
+                                th:text="${subCategory.displayName}">API 설계</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a class="btn btn-outline-secondary" th:href="@{/schedules}">취소</a>
+                <button class="btn btn-primary" type="submit">저장</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

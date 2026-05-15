@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>일정 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="container page-shell py-4">
+    <nav class="top-nav">
+        <div class="brand-mark">
+            <span class="office-character brand-mascot" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </span>
+            <span>일정 관리</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/dashboard}">대시보드</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedule-types}">타입 관리</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/quests}">퀘스트</a>
+            <a class="btn btn-primary btn-sm" th:href="@{/schedules/new}">일정 추가</a>
+        </div>
+    </nav>
+
+    <section class="hero-panel mb-4">
+        <div class="office-character" aria-hidden="true">
+            <span class="office-character__body"></span>
+            <span class="office-character__shirt"></span>
+            <span class="office-character__tie"></span>
+            <span class="office-character__badge">백</span>
+            <span class="office-character__head"></span>
+            <span class="office-character__hair"></span>
+            <span class="office-character__eye office-character__eye--left"></span>
+            <span class="office-character__eye office-character__eye--right"></span>
+            <span class="office-character__mouth"></span>
+        </div>
+        <div>
+            <p class="speech-bubble mb-2">계획은 작게 잡고, 퀘스트는 하나씩 클리어해요.</p>
+            <h1 class="h3 mb-1">성장 일정표</h1>
+            <p class="text-muted mb-0">공부, 시험, 이직 준비, 회고 일정을 앱 안에서 가볍게 관리합니다.</p>
+        </div>
+    </section>
+
+    <div th:if="${noticeMessage}" class="alert alert-success" th:text="${noticeMessage}"></div>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+            <article class="soft-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="section-title">오늘 일정 <small>오늘 깨야 할 계획</small></h2>
+                    <span class="level-badge" th:text="${#lists.size(todaySchedules)} + '개'">0개</span>
+                </div>
+                <div th:if="${#lists.isEmpty(todaySchedules)}" class="empty-state">
+                    오늘 예정된 일정이 없습니다.
+                </div>
+                <div class="quest-list" th:unless="${#lists.isEmpty(todaySchedules)}">
+                    <article class="quest-item" th:each="schedule : ${todaySchedules}">
+                        <div class="quest-main">
+                            <strong class="quest-title" th:text="${schedule.title}">일정 제목</strong>
+                            <div class="quest-meta">
+                                <span class="badge badge-soft" th:text="${schedule.startDateTimeText}">2026.05.14 19:00</span>
+                                <span class="badge text-bg-info" th:text="${schedule.typeLabel}">공부</span>
+                                <span class="badge text-bg-light" th:text="${schedule.statusLabel}">예정</span>
+                            </div>
+                        </div>
+                        <div class="quest-actions">
+                            <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedules/{id}/edit(id=${schedule.id})}">수정</a>
+                        </div>
+                    </article>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <article class="soft-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="section-title">이번 주 <small>7일 안의 성장 계획</small></h2>
+                    <span class="level-badge" th:text="${#lists.size(weekSchedules)} + '개'">0개</span>
+                </div>
+                <p class="text-muted mb-0">Dashboard에는 오늘 일정 3개와 예정된 일정 수가 표시됩니다.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="soft-card">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+            <h2 class="section-title">전체 일정 <small>시작 일시순</small></h2>
+            <a class="btn btn-primary btn-sm" th:href="@{/schedules/new}">일정 추가</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(schedules)}" class="empty-state">
+            아직 등록된 일정이 없습니다.
+        </div>
+
+        <div class="quest-list" th:unless="${#lists.isEmpty(schedules)}">
+            <article class="quest-item" th:each="schedule : ${schedules}">
+                <div class="quest-main">
+                    <strong class="quest-title" th:text="${schedule.title}">일정 제목</strong>
+                    <p class="text-muted small mb-1" th:text="${schedule.description}">설명</p>
+                    <div class="quest-meta">
+                        <span class="badge badge-soft" th:text="${schedule.startDateTimeText}">2026.05.14 19:00</span>
+                        <span class="badge badge-soft" th:if="${schedule.endDateTimeText != ''}"
+                              th:text="'~ ' + ${schedule.endDateTimeText}">~ 2026.05.14 20:00</span>
+                        <span class="badge text-bg-info" th:text="${schedule.typeLabel}">공부</span>
+                        <span class="badge text-bg-light" th:text="${schedule.statusLabel}">예정</span>
+                        <span class="badge badge-soft" th:text="${schedule.subCategoryDisplayName}">API 설계</span>
+                        <span class="badge badge-exp" th:if="${schedule.hasRelatedQuest}"
+                              th:text="'Quest: ' + ${schedule.relatedQuestTitle}">Quest</span>
+                    </div>
+                </div>
+                <div class="quest-actions">
+                    <form th:if="${!schedule.done}" th:action="@{/schedules/{id}/done(id=${schedule.id})}" method="post">
+                        <button class="btn btn-outline-success btn-sm" type="submit">완료</button>
+                    </form>
+                    <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedules/{id}/edit(id=${schedule.id})}">수정</a>
+                    <form th:action="@{/schedules/{id}/delete(id=${schedule.id})}" method="post">
+                        <button class="btn btn-outline-danger btn-sm" type="submit">삭제</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

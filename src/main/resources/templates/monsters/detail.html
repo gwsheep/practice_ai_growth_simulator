@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${monster.name}">Monster Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="container page-shell py-4">
+    <nav class="top-nav">
+        <div class="brand-mark">
+            <span class="office-character brand-mascot" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </span>
+            <span>Monster Detail</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/monsters}">목록</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/monsters/{id}/edit(id=${monster.id})}">수정</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/dashboard}">대시보드</a>
+        </div>
+    </nav>
+
+    <section class="hero-panel mb-4">
+        <div class="office-character" aria-hidden="true">
+            <span class="office-character__body"></span>
+            <span class="office-character__shirt"></span>
+            <span class="office-character__tie"></span>
+            <span class="office-character__badge">백</span>
+            <span class="office-character__head"></span>
+            <span class="office-character__hair"></span>
+            <span class="office-character__eye office-character__eye--left"></span>
+            <span class="office-character__eye office-character__eye--right"></span>
+            <span class="office-character__mouth"></span>
+        </div>
+        <div>
+            <p class="speech-bubble mb-2" th:if="${monster.attackable}">오늘은 10 데미지만 넣어도 충분해요.</p>
+            <p class="speech-bubble mb-2" th:if="${monster.defeated}">이 몬스터는 처치했어요. 기록으로 남겨둘게요.</p>
+            <p class="speech-bubble mb-2" th:if="${monster.archived}">보관된 몬스터입니다.</p>
+            <h1 class="h3 mb-1" th:text="${monster.name}">레거시 코드</h1>
+            <p class="text-muted mb-0" th:text="${monster.description}">설명</p>
+        </div>
+    </section>
+
+    <div th:if="${noticeMessage}" class="alert alert-success" th:text="${noticeMessage}"></div>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-lg-8">
+            <article class="soft-card h-100">
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 class="section-title mb-2">전투 상태 <small th:text="${monster.code}">CODE</small></h2>
+                        <div class="quest-meta">
+                            <span class="badge badge-soft" th:text="${monster.typeLabel}">타입</span>
+                            <span class="badge text-bg-light" th:text="${monster.statusLabel}">전투 중</span>
+                            <span class="badge text-bg-warning" th:text="${monster.difficultyLabel}">보통</span>
+                            <span class="badge badge-exp" th:text="'보상 EXP ' + ${monster.rewardExp}">보상 EXP 0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>HP</span>
+                    <span th:text="${monster.currentHp} + ' / ' + ${monster.maxHp}">50 / 60</span>
+                </div>
+                <div class="progress exp-progress mb-3" role="progressbar" aria-label="Monster HP">
+                    <div class="progress-bar bg-danger" th:style="'width: ' + ${monster.hpPercent} + '%'"></div>
+                </div>
+                <p class="text-muted small mb-0">
+                    보상 EXP는 이번 MVP에서 실제 Profile EXP나 GrowthLog에 반영하지 않습니다.
+                </p>
+            </article>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <article class="soft-card h-100">
+                <h2 class="section-title mb-3">공격</h2>
+                <form th:if="${monster.attackable}" th:action="@{/monsters/{id}/attack(id=${monster.id})}" method="post" th:object="${attackForm}">
+                    <label class="form-label" for="damage">데미지</label>
+                    <input class="form-control mb-3" id="damage" type="number" min="1" step="1" th:field="*{damage}">
+                    <button class="btn btn-danger w-100" type="submit">공격하기</button>
+                </form>
+                <div th:unless="${monster.attackable}" class="empty-state">
+                    종료된 몬스터는 공격할 수 없습니다.
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="soft-card">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <div>
+                <h2 class="section-title mb-2">연결된 성장 항목</h2>
+                <div class="quest-meta">
+                    <span class="badge badge-soft" th:text="${monster.relatedCategoryDisplayName}">성장 영역</span>
+                    <span class="badge badge-soft" th:text="${monster.relatedSubCategoryDisplayName}">세부 항목</span>
+                    <span class="badge text-bg-success" th:if="${monster.defeated}"
+                          th:text="'처치: ' + ${#temporals.format(monster.defeatedAt, 'yyyy.MM.dd HH:mm')}">처치</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary" th:href="@{/monsters/{id}/edit(id=${monster.id})}">수정</a>
+                <form th:unless="${monster.archived}" th:action="@{/monsters/{id}/archive(id=${monster.id})}" method="post">
+                    <button class="btn btn-outline-danger" type="submit">보관</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

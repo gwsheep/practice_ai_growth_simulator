@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weekly Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<main class="container page-shell py-4">
+    <nav class="top-nav">
+        <div class="brand-mark">
+            <span class="office-character brand-mascot" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </span>
+            <span>Weekly Report</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/dashboard}">대시보드</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/daily-reviews}">회고</a>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/quests}">퀘스트</a>
+            <a class="btn btn-primary btn-sm" th:href="@{/quests/new}">퀘스트 추가</a>
+        </div>
+    </nav>
+
+    <section class="hero-panel mb-4">
+        <div class="office-character" aria-hidden="true">
+            <span class="office-character__body"></span>
+            <span class="office-character__shirt"></span>
+            <span class="office-character__tie"></span>
+            <span class="office-character__badge">백</span>
+            <span class="office-character__head"></span>
+            <span class="office-character__hair"></span>
+            <span class="office-character__eye office-character__eye--left"></span>
+            <span class="office-character__eye office-character__eye--right"></span>
+            <span class="office-character__mouth"></span>
+        </div>
+        <div>
+            <p class="speech-bubble mb-2" th:text="${report.baekdungiMessage}">이번 주도 많이 성장했어요.</p>
+            <h1 class="h3 mb-1">주간 성장 리포트</h1>
+            <p class="text-muted mb-0">
+                <span th:text="${#temporals.format(report.weekStartDate, 'yyyy.MM.dd')}">2026.05.11</span>
+                <span> ~ </span>
+                <span th:text="${#temporals.format(report.weekEndDate, 'yyyy.MM.dd')}">2026.05.17</span>
+            </p>
+        </div>
+    </section>
+
+    <section class="soft-card mb-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-secondary btn-sm"
+                   th:href="@{/weekly-reports(weekStart=${report.previousWeekStartDate})}">이전 주</a>
+                <a class="btn btn-outline-primary btn-sm" th:href="@{/weekly-reports/current}">이번 주</a>
+                <a class="btn btn-outline-secondary btn-sm"
+                   th:href="@{/weekly-reports(weekStart=${report.nextWeekStartDate})}">다음 주</a>
+            </div>
+            <form class="d-flex gap-2" method="get" th:action="@{/weekly-reports}">
+                <input class="form-control form-control-sm" type="date" name="weekStart"
+                       th:value="${report.weekStartDate}">
+                <button class="btn btn-primary btn-sm" type="submit">조회</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="stat-grid mb-4">
+        <article class="stat-card">
+            <span>완료 Quest</span>
+            <strong th:text="${report.completedQuestCount}">0</strong>
+        </article>
+        <article class="stat-card">
+            <span>획득 EXP</span>
+            <strong th:text="${report.totalGainedExp}">0</strong>
+        </article>
+        <article class="stat-card">
+            <span>가장 성장한 영역</span>
+            <strong class="text-end fs-6" th:text="${report.mostGrownCategoryName}">아직 없음</strong>
+        </article>
+        <article class="stat-card">
+            <span>평균 기분</span>
+            <strong th:text="${report.averageMoodScore > 0 ? #numbers.formatDecimal(report.averageMoodScore, 1, 1) + '점' : '-'}">-</strong>
+        </article>
+    </section>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            <article class="soft-card h-100">
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                    <h2 class="section-title">Category 성장 <small>GrowthLog 기준</small></h2>
+                    <span class="level-badge" th:text="${report.growthSummary.growthLogCount} + ' logs'">0 logs</span>
+                </div>
+                <div th:if="${#lists.isEmpty(report.categoryGrowthSummaries)}" class="empty-state">
+                    이번 주 성장 로그가 아직 없어요.
+                </div>
+                <div class="quest-list" th:unless="${#lists.isEmpty(report.categoryGrowthSummaries)}">
+                    <article class="quest-item" th:each="growth : ${report.categoryGrowthSummaries}">
+                        <div class="quest-main">
+                            <strong class="quest-title" th:text="${growth.categoryDisplayName}">백엔드</strong>
+                            <div class="quest-meta">
+                                <span class="badge badge-exp" th:text="'+' + ${growth.expGained} + ' EXP'">+30 EXP</span>
+                                <span class="badge badge-soft" th:text="${growth.logCount} + '회'">1회</span>
+                                <span class="badge text-bg-warning" th:if="${growth.top}">TOP</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </article>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <article class="soft-card h-100">
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+                    <h2 class="section-title">SubCategory 성장 <small>세부 항목</small></h2>
+                    <span class="level-badge" th:text="${report.mostGrownSubCategoryName}">아직 없음</span>
+                </div>
+                <div th:if="${#lists.isEmpty(report.subCategoryGrowthSummaries)}" class="empty-state">
+                    이번 주 세부 성장 기록이 아직 없어요.
+                </div>
+                <div class="quest-list" th:unless="${#lists.isEmpty(report.subCategoryGrowthSummaries)}">
+                    <article class="quest-item" th:each="growth : ${report.subCategoryGrowthSummaries}">
+                        <div class="quest-main">
+                            <strong class="quest-title" th:text="${growth.subCategoryDisplayName}">API 설계</strong>
+                            <div class="quest-meta">
+                                <span class="badge badge-soft" th:text="${growth.categoryDisplayName}">백엔드</span>
+                                <span class="badge badge-exp" th:text="'+' + ${growth.expGained} + ' EXP'">+30 EXP</span>
+                                <span class="badge text-bg-warning" th:if="${growth.top}">TOP</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="soft-card mb-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+            <h2 class="section-title">완료 Quest <small>이번 주 클리어 기록</small></h2>
+            <a class="btn btn-primary btn-sm" th:href="@{/quests/new}">Quest 추가</a>
+        </div>
+        <div th:if="${#lists.isEmpty(report.completedQuests)}" class="empty-state">
+            이번 주 완료한 Quest가 아직 없어요.
+        </div>
+        <div class="quest-list" th:unless="${#lists.isEmpty(report.completedQuests)}">
+            <article class="quest-item" th:each="quest : ${report.completedQuests}">
+                <div class="quest-main">
+                    <strong class="quest-title" th:text="${quest.title}">Quest 제목</strong>
+                    <div class="quest-meta">
+                        <span class="badge badge-soft" th:text="${quest.categoryDisplayName}">백엔드</span>
+                        <span class="badge badge-soft" th:text="${quest.subCategoryDisplayName}">API 설계</span>
+                        <span class="badge text-bg-warning" th:text="${quest.difficultyLabel}">쉬움</span>
+                        <span class="badge badge-exp" th:text="'+' + ${quest.expReward} + ' EXP'">+10 EXP</span>
+                    </div>
+                </div>
+                <span class="text-muted small"
+                      th:text="${quest.completedAt == null ? '' : #temporals.format(quest.completedAt, 'MM.dd HH:mm')}">05.14 20:00</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="soft-card mb-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+            <h2 class="section-title">Daily Review 흐름 <small>기분과 배움</small></h2>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/daily-reviews/new}">오늘 회고</a>
+        </div>
+        <div class="growth-summary-grid growth-summary-grid--compact mb-3">
+            <article class="growth-summary-card">
+                <span>회고 수</span>
+                <strong th:text="${report.moodSummary.reviewCount}">0</strong>
+                <small>개</small>
+            </article>
+            <article class="growth-summary-card">
+                <span>평균 기분</span>
+                <strong th:text="${report.averageMoodScore > 0 ? #numbers.formatDecimal(report.averageMoodScore, 1, 1) : '-'}">-</strong>
+                <small th:text="${report.moodSummary.averageMoodLabel}">아직 없음</small>
+            </article>
+        </div>
+        <div th:if="${#lists.isEmpty(report.dailyReviewSummaries)}" class="empty-state">
+            이번 주 회고가 아직 없어요. 오늘의 Daily Review를 작성해볼까요?
+        </div>
+        <div class="quest-list" th:unless="${#lists.isEmpty(report.dailyReviewSummaries)}">
+            <article class="quest-item" th:each="review : ${report.dailyReviewSummaries}">
+                <div class="quest-main">
+                    <strong class="quest-title" th:text="${review.reviewDateText}">05.14</strong>
+                    <p class="text-muted small mb-1" th:text="${review.learnedSummary}">배운 것</p>
+                    <div class="quest-meta">
+                        <span class="badge badge-exp" th:text="'기분 ' + ${review.moodScore} + ' · ' + ${review.moodLabel}">기분 4</span>
+                        <span class="badge badge-soft" th:text="${review.subCategoryDisplayName}">API 설계</span>
+                    </div>
+                </div>
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/daily-reviews/{id}(id=${review.id})}">보기</a>
+            </article>
+        </div>
+    </section>
+
+    <section th:if="${report.empty}" class="soft-card">
+        <div class="empty-state">
+            조금씩 기록이 쌓이면 주간 리포트가 더 풍성해져요.
+            <div class="mt-3 d-flex flex-wrap gap-2 justify-content-center">
+                <a class="btn btn-primary btn-sm" th:href="@{/quests/new}">Quest 시작</a>
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/daily-reviews/new}">회고 작성</a>
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/schedules/new}">일정 추가</a>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
