@@ -1,8 +1,11 @@
 package com.devgwon.growthsimulator.monster.service;
 
+import java.util.List;
+
 public record DashboardMonsterSummary(
         long activeMonsterCount,
         MonsterView almostDefeatedMonster,
-        MonsterView recentDefeatedMonster
+        MonsterView recentDefeatedMonster,
+        List<MonsterView> activeMonsters
 ) {
 }

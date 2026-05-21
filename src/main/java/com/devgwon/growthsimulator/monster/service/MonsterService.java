@@ -132,7 +132,10 @@ public class MonsterService {
                         .orElse(null),
                 monsterRepository.findFirstByProfileAndStatusOrderByDefeatedAtDesc(profile, MonsterStatus.DEFEATED)
                         .map(MonsterView::from)
-                        .orElse(null)
+                        .orElse(null),
+                monsterRepository.findTop3ByProfileAndStatusInOrderByCurrentHpAsc(profile, battleStatuses).stream()
+                        .map(MonsterView::from)
+                        .toList()
         );
     }
 

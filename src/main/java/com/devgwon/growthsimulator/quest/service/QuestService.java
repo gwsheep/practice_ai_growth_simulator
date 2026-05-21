@@ -44,6 +44,14 @@ public class QuestService {
         return questRepository.findByProfileOrderByCreatedAtDesc(profile);
     }
 
+    @Transactional(readOnly = true)
+    public List<QuestListItemView> findQuestViewsForDefaultProfile() {
+        DeveloperProfile profile = profileService.getOrCreateDefaultProfile();
+        return questRepository.findByProfileOrderByCreatedAtDesc(profile).stream()
+                .map(QuestListItemView::from)
+                .toList();
+    }
+
     @Transactional
     public Quest createQuest(QuestCreateRequest request) {
         validateCreateRequest(request);

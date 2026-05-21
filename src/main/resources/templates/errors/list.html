@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Error Museum</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/game-ui.css}">
+</head>
+<body>
+<main class="container page-shell py-4">
+    <nav th:replace="~{fragments/navigation :: nav('errors')}"></nav>
+
+    <section class="game-hero mb-4">
+        <div class="mascot-panel">
+            <div class="office-character" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </div>
+            <div>
+                <span class="game-hero__eyebrow">ERROR COLLECTION</span>
+                <p class="speech-bubble mb-2">에러는 실패가 아니라 다음에 꺼내 볼 성장 수집품이에요.</p>
+                <h1 class="h3 mb-1">에러 박물관</h1>
+                <p class="text-muted mb-0">발생 상황과 해결 방법을 남겨두면 다음 디버깅 시간이 짧아집니다.</p>
+            </div>
+        </div>
+        <div class="game-hero__stats">
+            <article class="stat-card">
+                <span>수집품</span>
+                <strong th:text="${#lists.size(errors)}">0</strong>
+                <small>현재 필터 결과</small>
+            </article>
+            <a class="action-button" th:href="@{/errors/new}">새 에러 수집하기</a>
+        </div>
+    </section>
+
+    <div th:if="${noticeMessage}" class="alert alert-success" th:text="${noticeMessage}"></div>
+
+    <section class="filter-panel mb-4">
+        <form class="row g-2 align-items-end" th:action="@{/errors}" method="get">
+            <div class="col-12 col-md-3">
+                <label class="form-label" for="status">상태</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">전체</option>
+                    <option th:each="status : ${statuses}"
+                            th:value="${status}"
+                            th:selected="${selectedStatus == status}"
+                            th:text="${status.label}">수집 중</option>
+                </select>
+            </div>
+            <div class="col-12 col-md">
+                <label class="form-label" for="keyword">검색</label>
+                <input class="form-control" id="keyword" name="keyword" type="search"
+                       th:value="${keyword}" placeholder="제목, 에러명, 상황, 해결 방법">
+            </div>
+            <div class="col-12 col-md-auto d-flex gap-2">
+                <button class="action-button" type="submit">검색</button>
+                <a class="secondary-button" th:href="@{/errors}">초기화</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="game-card">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+            <h2 class="section-title">수집된 에러 <small>상황과 해결책을 함께 보관</small></h2>
+            <a class="action-button" th:href="@{/errors/new}">에러 수집하기</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(errors)}" class="empty-state">
+            아직 수집된 에러가 없어요. 다음 에러는 성장 아이템으로 저장해봐요!
+        </div>
+
+        <div class="game-grid" th:unless="${#lists.isEmpty(errors)}">
+            <article class="museum-card" th:each="error : ${errors}">
+                <div class="museum-card__meta">
+                    <span class="status-badge" th:text="${error.statusLabel}">수집 중</span>
+                    <span class="severity-badge" th:text="${error.severityLabel}">주의</span>
+                    <span class="status-badge" th:text="${error.growthSubCategoryDisplayName}">Spring Boot</span>
+                </div>
+                <div class="museum-card__body">
+                    <strong class="h5 d-block mb-2" th:text="${error.title}">PKIX 인증서 오류</strong>
+                    <p class="mb-2"><span th:text="${error.errorName}">PKIX</span></p>
+                    <p class="small mb-2" th:text="${error.situation}">발생 상황</p>
+                    <p class="small mb-0">
+                        <span th:text="${error.growthCategoryDisplayName}">Framework</span>
+                        <span> · </span>
+                        <span th:text="${error.questTitle}">연결된 Quest 없음</span>
+                    </p>
+                    <p class="small mb-0">
+                        <span>발생 </span>
+                        <span th:text="${#temporals.format(error.occurredAt, 'MM.dd HH:mm')}">05.21 10:00</span>
+                    </p>
+                </div>
+                <div class="museum-card__footer">
+                    <a class="secondary-button" th:href="@{/errors/{id}(id=${error.id})}">전시 보기</a>
+                    <form th:if="${error.open}" th:action="@{/errors/{id}/resolve(id=${error.id})}" method="post">
+                        <button class="action-button" type="submit">해결</button>
+                    </form>
+                    <form th:unless="${error.archived}" th:action="@{/errors/{id}/archive(id=${error.id})}" method="post">
+                        <button class="secondary-button" type="submit">보관</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

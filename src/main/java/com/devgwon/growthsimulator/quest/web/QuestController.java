@@ -35,7 +35,7 @@ public class QuestController {
 
     @GetMapping
     public String quests(Model model) {
-        model.addAttribute("quests", questService.findQuestsForDefaultProfile());
+        model.addAttribute("quests", questService.findQuestViewsForDefaultProfile());
         return "quests/index";
     }
 

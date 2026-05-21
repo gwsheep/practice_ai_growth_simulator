@@ -6,12 +6,15 @@
     <title>Monster System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/game-ui.css}">
 </head>
 <body>
 <main class="container page-shell py-4">
-    <nav class="top-nav">
-        <div class="brand-mark">
-            <span class="office-character brand-mascot" aria-hidden="true">
+    <nav th:replace="~{fragments/navigation :: nav('monsters')}"></nav>
+
+    <section class="game-hero mb-4">
+        <div class="mascot-panel">
+            <div class="office-character" aria-hidden="true">
                 <span class="office-character__body"></span>
                 <span class="office-character__shirt"></span>
                 <span class="office-character__tie"></span>
@@ -21,71 +24,62 @@
                 <span class="office-character__eye office-character__eye--left"></span>
                 <span class="office-character__eye office-character__eye--right"></span>
                 <span class="office-character__mouth"></span>
-            </span>
-            <span>Monster System</span>
-        </div>
-        <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary btn-sm" th:href="@{/dashboard}">대시보드</a>
-            <a class="btn btn-outline-secondary btn-sm" th:href="@{/weekly-reports}">주간 리포트</a>
-            <a class="btn btn-primary btn-sm" th:href="@{/monsters/new}">몬스터 등록</a>
-        </div>
-    </nav>
-
-    <section class="hero-panel mb-4">
-        <div class="office-character" aria-hidden="true">
-            <span class="office-character__body"></span>
-            <span class="office-character__shirt"></span>
-            <span class="office-character__tie"></span>
-            <span class="office-character__badge">백</span>
-            <span class="office-character__head"></span>
-            <span class="office-character__hair"></span>
-            <span class="office-character__eye office-character__eye--left"></span>
-            <span class="office-character__eye office-character__eye--right"></span>
-            <span class="office-character__mouth"></span>
-        </div>
+            </div>
         <div>
+            <span class="game-hero__eyebrow">MONSTER ARENA</span>
             <p class="speech-bubble mb-2">막연한 불안을 이름 붙이면 상대할 수 있는 몬스터가 됩니다.</p>
             <h1 class="h3 mb-1">몬스터 도감</h1>
             <p class="text-muted mb-0">버그, 레거시 코드, 커뮤니케이션 스트레스를 작게 공격해요.</p>
+        </div>
+        </div>
+        <div class="game-hero__stats">
+            <article class="stat-card">
+                <span>전투장</span>
+                <strong th:text="${#lists.size(monsters)}">0</strong>
+                <small>보관 제외 몬스터</small>
+            </article>
+            <a class="action-button" th:href="@{/monsters/new}">새 몬스터 등록</a>
         </div>
     </section>
 
     <div th:if="${noticeMessage}" class="alert alert-success" th:text="${noticeMessage}"></div>
 
-    <section class="soft-card">
+    <section class="game-card">
         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
             <h2 class="section-title">마주한 몬스터 <small>ARCHIVED 제외</small></h2>
-            <a class="btn btn-primary btn-sm" th:href="@{/monsters/new}">몬스터 등록</a>
+            <a class="action-button" th:href="@{/monsters/new}">몬스터 등록</a>
         </div>
 
         <div th:if="${#lists.isEmpty(monsters)}" class="empty-state">
             아직 마주한 몬스터가 없어요. 요즘 신경 쓰이는 문제를 하나 등록해볼까요?
         </div>
 
-        <div class="quest-list" th:unless="${#lists.isEmpty(monsters)}">
-            <article class="quest-item" th:each="monster : ${monsters}">
-                <div class="quest-main">
-                    <strong class="quest-title" th:text="${monster.name}">레거시 코드</strong>
+        <div class="game-grid" th:unless="${#lists.isEmpty(monsters)}">
+            <article class="boss-card" th:each="monster : ${monsters}">
+                <div class="boss-card__meta">
+                    <span class="status-badge" th:text="${monster.typeLabel}">레거시 코드</span>
+                    <span class="status-badge" th:text="${monster.statusLabel}">전투 중</span>
+                    <span class="severity-badge" th:text="${monster.difficultyLabel}">보통</span>
+                </div>
+                <div>
+                    <strong class="h5 d-block mb-2" th:text="${monster.name}">레거시 코드</strong>
                     <p class="text-muted small mb-2" th:text="${monster.description}">설명</p>
-                    <div class="quest-meta mb-2">
-                        <span class="badge badge-soft" th:text="${monster.typeLabel}">레거시 코드</span>
-                        <span class="badge text-bg-light" th:text="${monster.statusLabel}">전투 중</span>
-                        <span class="badge text-bg-warning" th:text="${monster.difficultyLabel}">보통</span>
-                        <span class="badge badge-soft" th:text="${monster.relatedSubCategoryDisplayName}">미지정</span>
-                    </div>
+                    <p class="small text-muted mb-0" th:text="${monster.relatedSubCategoryDisplayName}">미지정</p>
+                </div>
+                <div>
                     <div class="d-flex justify-content-between small text-muted mb-1">
                         <span>HP</span>
                         <span th:text="${monster.currentHp} + ' / ' + ${monster.maxHp}">50 / 60</span>
                     </div>
-                    <div class="progress exp-progress" role="progressbar" aria-label="Monster HP">
-                        <div class="progress-bar bg-danger" th:style="'width: ' + ${monster.hpPercent} + '%'"></div>
+                    <div class="progress-track" role="progressbar" aria-label="Monster HP">
+                        <div class="progress-fill progress-fill--danger" th:style="'width: ' + ${monster.hpPercent} + '%'"></div>
                     </div>
                 </div>
-                <div class="quest-actions">
-                    <a class="btn btn-outline-secondary btn-sm" th:href="@{/monsters/{id}(id=${monster.id})}">상세</a>
+                <div class="boss-card__footer">
+                    <a class="secondary-button" th:href="@{/monsters/{id}(id=${monster.id})}">상세</a>
                     <form th:if="${monster.attackable}" th:action="@{/monsters/{id}/attack(id=${monster.id})}" method="post">
                         <input type="hidden" name="damage" value="10">
-                        <button class="btn btn-outline-danger btn-sm" type="submit">공격</button>
+                        <button class="action-button" type="submit">공격</button>
                     </form>
                 </div>
             </article>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="app-nav" th:fragment="nav(active)">
+    <a class="nav-brand" th:href="@{/dashboard}">
+        <span class="office-character brand-mascot" aria-hidden="true">
+            <span class="office-character__body"></span>
+            <span class="office-character__shirt"></span>
+            <span class="office-character__tie"></span>
+            <span class="office-character__badge">백</span>
+            <span class="office-character__head"></span>
+            <span class="office-character__hair"></span>
+            <span class="office-character__eye office-character__eye--left"></span>
+            <span class="office-character__eye office-character__eye--right"></span>
+            <span class="office-character__mouth"></span>
+        </span>
+        <span>Developer Growth</span>
+    </a>
+    <div class="nav-menu">
+        <a class="nav-item" th:classappend="${active == 'dashboard'} ? ' nav-item-active'" th:href="@{/dashboard}">Dashboard</a>
+        <a class="nav-item" th:classappend="${active == 'quests'} ? ' nav-item-active'" th:href="@{/quests}">Quest</a>
+        <a class="nav-item" th:classappend="${active == 'schedules'} ? ' nav-item-active'" th:href="@{/schedules}">Schedule</a>
+        <a class="nav-item" th:classappend="${active == 'reviews'} ? ' nav-item-active'" th:href="@{/daily-reviews}">Daily Review</a>
+        <a class="nav-item" th:classappend="${active == 'weekly'} ? ' nav-item-active'" th:href="@{/weekly-reports}">Weekly Report</a>
+        <a class="nav-item" th:classappend="${active == 'monsters'} ? ' nav-item-active'" th:href="@{/monsters}">Monster</a>
+        <a class="nav-item" th:classappend="${active == 'errors'} ? ' nav-item-active'" th:href="@{/errors}">Error Museum</a>
+        <a class="nav-item" th:classappend="${active == 'growth'} ? ' nav-item-active'" th:href="@{/growth-categories}">Growth Settings</a>
+    </div>
+</nav>
+</body>
+</html>

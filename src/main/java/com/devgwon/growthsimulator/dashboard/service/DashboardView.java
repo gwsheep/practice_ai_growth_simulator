@@ -4,6 +4,7 @@ import com.devgwon.growthsimulator.schedule.service.DashboardScheduleSummary;
 import com.devgwon.growthsimulator.review.service.DailyReviewSummaryView;
 import com.devgwon.growthsimulator.weeklyreport.service.DashboardWeeklyReportSummary;
 import com.devgwon.growthsimulator.monster.service.DashboardMonsterSummary;
+import com.devgwon.growthsimulator.errorrecord.service.DashboardErrorRecordSummary;
 import java.util.List;
 
 public record DashboardView(
@@ -20,6 +21,7 @@ public record DashboardView(
         Long todayReviewId,
         List<DailyReviewSummaryView> recentDailyReviews,
         DashboardWeeklyReportSummary weeklyReportSummary,
-        DashboardMonsterSummary monsterSummary
+        DashboardMonsterSummary monsterSummary,
+        DashboardErrorRecordSummary errorRecordSummary
 ) {
 }

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${editMode} ? '에러 기록 수정' : '에러 기록 등록'">에러 기록 등록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/game-ui.css}">
+</head>
+<body>
+<main class="container page-shell py-4">
+    <nav th:replace="~{fragments/navigation :: nav('errors')}"></nav>
+
+    <section class="hero-panel mb-4">
+        <div class="office-character" aria-hidden="true">
+            <span class="office-character__body"></span>
+            <span class="office-character__shirt"></span>
+            <span class="office-character__tie"></span>
+            <span class="office-character__badge">백</span>
+            <span class="office-character__head"></span>
+            <span class="office-character__hair"></span>
+            <span class="office-character__eye office-character__eye--left"></span>
+            <span class="office-character__eye office-character__eye--right"></span>
+            <span class="office-character__mouth"></span>
+        </div>
+        <div>
+            <p class="speech-bubble mb-2">완벽히 정리하지 않아도 괜찮아요. 다음의 나에게 힌트만 남겨도 충분해요.</p>
+            <h1 class="h3 mb-1" th:text="${editMode} ? '수집품 다듬기' : '새 에러 수집품'">새 에러 수집품</h1>
+            <p class="text-muted mb-0">GrowthLog나 EXP는 만들지 않고, 복기용 기록만 남깁니다.</p>
+        </div>
+    </section>
+
+    <section class="soft-card form-panel">
+        <form class="quest-form"
+              th:object="${errorForm}"
+              th:action="${editMode} ? @{/errors/{id}/edit(id=${errorRecordId})} : @{/errors}"
+              method="post">
+            <div class="row g-3">
+                <div class="col-12 col-md-7">
+                    <label class="form-label" for="title">제목</label>
+                    <input class="form-control" id="title" type="text" th:field="*{title}"
+                           placeholder="예: Docker PostgreSQL 연결 거부">
+                </div>
+                <div class="col-12 col-md-5">
+                    <label class="form-label" for="errorName">에러명</label>
+                    <input class="form-control" id="errorName" type="text" th:field="*{errorName}"
+                           placeholder="예: Connection refused">
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="status">상태</label>
+                    <select class="form-select" id="status" th:field="*{status}">
+                        <option th:each="status : ${statuses}" th:value="${status}" th:text="${status.label}">수집 중</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="severity">심각도</label>
+                    <select class="form-select" id="severity" th:field="*{severity}">
+                        <option th:each="severity : ${severities}" th:value="${severity}" th:text="${severity.label}">주의</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="occurredAt">발생일시</label>
+                    <input class="form-control" id="occurredAt" name="occurredAt" type="datetime-local"
+                           th:value="${errorForm.occurredAt == null ? '' : #temporals.format(errorForm.occurredAt, 'yyyy-MM-dd''T''HH:mm')}">
+                </div>
+            </div>
+            <div>
+                <label class="form-label" for="situation">발생 상황</label>
+                <textarea class="form-control" id="situation" rows="4" th:field="*{situation}"
+                          placeholder="어떤 작업 중에 발생했는지 적어주세요."></textarea>
+            </div>
+            <div>
+                <label class="form-label" for="cause">원인</label>
+                <textarea class="form-control" id="cause" rows="3" th:field="*{cause}"
+                          placeholder="아직 모르면 비워두어도 됩니다."></textarea>
+            </div>
+            <div>
+                <label class="form-label" for="solution">해결 방법</label>
+                <textarea class="form-control" id="solution" rows="4" th:field="*{solution}"
+                          placeholder="명령어, 설정 변경, 참고한 판단을 남겨주세요."></textarea>
+            </div>
+            <div>
+                <label class="form-label" for="memo">메모</label>
+                <textarea class="form-control" id="memo" rows="3" th:field="*{memo}"
+                          placeholder="다음에 확인할 점이나 관련 링크를 적어주세요."></textarea>
+            </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="growthSubCategoryId">관련 성장 중분류</label>
+                    <select class="form-select" id="growthSubCategoryId" th:field="*{growthSubCategoryId}">
+                        <option value="">선택해 주세요</option>
+                        <option th:each="subCategory : ${growthSubCategories}"
+                                th:value="${subCategory.id}"
+                                th:text="${subCategory.label}">Framework · Spring Boot</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="questId">연결 Quest</label>
+                    <select class="form-select" id="questId" th:field="*{questId}">
+                        <option value="">선택 안 함</option>
+                        <option th:each="quest : ${quests}"
+                                th:value="${quest.id}"
+                                th:text="${quest.label}">Quest</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <a class="btn btn-outline-secondary" th:href="@{/errors}">취소</a>
+                <button class="btn btn-primary" type="submit" th:text="${editMode} ? '수정' : '등록'">등록</button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

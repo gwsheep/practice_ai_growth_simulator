@@ -2,6 +2,7 @@ package com.devgwon.growthsimulator.dashboard.service;
 
 import com.devgwon.growthsimulator.character.domain.DeveloperProfile;
 import com.devgwon.growthsimulator.character.service.DeveloperProfileService;
+import com.devgwon.growthsimulator.errorrecord.service.ErrorRecordService;
 import com.devgwon.growthsimulator.growth.repository.GrowthCategoryRepository;
 import com.devgwon.growthsimulator.growth.repository.GrowthLogRepository;
 import com.devgwon.growthsimulator.growth.repository.GrowthSubCategoryRepository;
@@ -33,6 +34,7 @@ public class DashboardService {
     private final DailyReviewRepository dailyReviewRepository;
     private final WeeklyReportService weeklyReportService;
     private final MonsterService monsterService;
+    private final ErrorRecordService errorRecordService;
 
     public DashboardService(
             DeveloperProfileService profileService,
@@ -43,7 +45,8 @@ public class DashboardService {
             ScheduleRepository scheduleRepository,
             DailyReviewRepository dailyReviewRepository,
             WeeklyReportService weeklyReportService,
-            MonsterService monsterService
+            MonsterService monsterService,
+            ErrorRecordService errorRecordService
     ) {
         this.profileService = profileService;
         this.categoryRepository = categoryRepository;
@@ -54,6 +57,7 @@ public class DashboardService {
         this.dailyReviewRepository = dailyReviewRepository;
         this.weeklyReportService = weeklyReportService;
         this.monsterService = monsterService;
+        this.errorRecordService = errorRecordService;
     }
 
     @Transactional
@@ -78,6 +82,7 @@ public class DashboardService {
                 growthCategories,
                 recentGrowthLogs,
                 questRepository.findByProfileOrderByCreatedAtDesc(profile).stream()
+                        .limit(3)
                         .map(QuestSummaryView::from)
                         .toList(),
                 questRepository.findTop5ByProfileAndStatusOrderByCompletedAtDesc(profile, QuestStatus.COMPLETED).stream()
@@ -109,7 +114,8 @@ public class DashboardService {
                         .map(DailyReviewSummaryView::from)
                         .toList(),
                 weeklyReportService.getDashboardSummary(),
-                monsterService.getDashboardSummary()
+                monsterService.getDashboardSummary(),
+                errorRecordService.getDashboardSummary()
         );
     }
 

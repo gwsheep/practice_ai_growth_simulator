@@ -21,6 +21,11 @@ public interface MonsterRepository extends JpaRepository<Monster, Long> {
             Collection<MonsterStatus> statuses
     );
 
+    List<Monster> findTop3ByProfileAndStatusInOrderByCurrentHpAsc(
+            DeveloperProfile profile,
+            Collection<MonsterStatus> statuses
+    );
+
     Optional<Monster> findFirstByProfileAndStatusOrderByDefeatedAtDesc(
             DeveloperProfile profile,
             MonsterStatus status

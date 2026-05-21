@@ -4,7 +4,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 사용자는 Quest를 완료하고 EXP를 얻으며, Level up하고, AI + 백엔드 개발자로서 성장한다. UI는 무거운 관리자 페이지가 아니라 백둥이가 말풍선으로 안내하는 밝고 가벼운 성장 시뮬레이터를 지향한다.
 
-현재 핵심 구조는 `DeveloperProfile`, `Quest`, `GrowthCategory`, `GrowthSubCategory`, `GrowthLog`, `CharacterMessageService`, `Dashboard`, Thymeleaf 기반 UI, PostgreSQL 로컬 DB를 중심으로 한다.
+현재 핵심 구조는 `DeveloperProfile`, `Quest`, `GrowthCategory`, `GrowthSubCategory`, `GrowthLog`, `Schedule`, `DailyReview`, `WeeklyReport`, `Monster`, `ErrorRecord`, `CharacterMessageService`, `Dashboard`, Thymeleaf 기반 UI, PostgreSQL 로컬 DB를 중심으로 한다.
 
 성장 항목은 고정 필드가 아니라 `GrowthCategory` / `GrowthSubCategory` 기반으로 관리한다.
 
@@ -276,42 +276,90 @@ Low
 
 DeveloperProfile의 `title`과 충돌하지 않도록 한다. 처음에는 `title`을 덮어쓰기보다 별도 JobClass를 연결하고, 표시만 Dashboard에서 조합하는 방식이 안전하다.
 
-## Error Museum
+## Error Museum (완료)
 
-### 목적
+### 목적 (완료)
 
 개발 중 만난 에러와 해결 과정을 기록한다. 에러를 실패 기록이 아니라 성장 수집품처럼 저장해, 나중에 같은 문제를 다시 만났을 때 빠르게 복기할 수 있게 한다.
 
-### 주요 기능
+### 주요 기능 (완료)
 
+- ErrorRecord Entity 추가
 - 에러 이름 기록
 - 발생 상황 기록
 - 원인 기록
 - 해결 방법 기록
+- 심각도 관리
+- 상태 관리: OPEN, RESOLVED, ARCHIVED
 - 관련 GrowthSubCategory 연결
 - 관련 Quest 연결
-- 자주 만난 에러 목록
-- Blog Draft Generator와 연결
+- 목록/상세/등록/수정/삭제
+- 해결 처리
+- 보관 처리
+- 상태 필터
+- 키워드 검색
+- Dashboard 최근 ErrorRecord 3개 표시
 - 예시: PKIX, EntityManager, DataIntegrityViolationException, Docker/PostgreSQL 접속 오류, JWT 오류
 
-### 예상 Entity
+### Entity (완료)
 
 - ErrorRecord
+
+### 추후 확장 후보
+
 - ErrorTag
 - ErrorGrowthLink
 - ErrorQuestLink
+- 자주 만난 에러 목록
+- Blog Draft Generator와 연결
 
-### 구현 우선순위
+### 구현 우선순위 (완료)
 
 Medium
 
-### MVP 이후 언제 붙이면 좋을지
+### MVP 이후 언제 붙이면 좋을지 (완료)
 
 Daily Review 이후, AI Coach 이전이나 직후에 붙이면 좋다. 실제 문제 해결 경험이 쌓이기 시작할 때 학습 효율이 높아진다.
 
-### 구현 시 주의사항
+### 구현 시 주의사항 (완료)
 
-에러 기록은 너무 많은 필드를 요구하면 사용자가 기록하지 않는다. 처음에는 제목, 상황, 해결 방법, 연결 성장 항목 정도로 시작한다.
+에러 기록은 너무 많은 필드를 요구하면 사용자가 기록하지 않는다. 처음에는 제목, 상황, 해결 방법, 연결 성장 항목 정도로 시작했다. GrowthLog 자동 생성, Monster 자동 연동, Blog Draft Generator, AI Coach 연동은 제외했다.
+
+## Game Lobby / App Home UI 정리 (완료)
+
+### 목적 (완료)
+
+Dashboard와 주요 기능 화면이 무거운 관리자 페이지처럼 보이지 않도록 정리한다. Dashboard는 전체 목록을 길게 보여주는 화면이 아니라, 백둥이가 안내하는 앱 홈형 게임 로비로 사용하고, 상세 관리 기능은 각 전용 화면으로 분리한다.
+
+### 주요 기능 (완료)
+
+- Dashboard Hero 영역 개선
+- 백둥이 캐릭터와 말풍선 중심 배치
+- Level/EXP 진행도 표시
+- 오늘의 루틴 chip 표시
+- Quest, Schedule, Monster, Error Museum, Daily Review, Weekly Report 빠른 이동 메뉴
+- 공통 네비게이션 fragment 추가
+- `game-ui.css` 공통 게임형 UI 스타일 추가
+- Error Museum 목록/상세 카드형 UI 개선
+- Monster 목록 전투장형 UI 개선
+- Schedule, Daily Review, Weekly Report, Growth Settings 화면에 공통 헤더 톤 적용
+
+### 예상 Entity (완료)
+
+- 별도 Entity 없음
+- Thymeleaf template, CSS, fragment 중심
+
+### 구현 우선순위 (완료)
+
+Medium
+
+### MVP 이후 언제 붙이면 좋을지 (완료)
+
+Error Museum까지 기능이 쌓인 뒤, Dashboard가 너무 긴 목록형 화면이 되지 않도록 UI 구조를 정리했다. 이후 기능이 추가되더라도 Dashboard는 요약과 이동 허브 역할만 유지한다.
+
+### 구현 시 주의사항 (완료)
+
+React, Vue, Canvas를 도입하지 않고 Thymeleaf, HTML, CSS, 최소 JavaScript로 구현했다. Entity와 핵심 비즈니스 로직은 변경하지 않고, 기존 URL을 유지했다.
 
 ## Blog Draft Generator
 
@@ -469,17 +517,20 @@ React로 전환하지 않고 Thymeleaf, CSS animation, 간단한 JavaScript로 �
 4. Daily Review (완료)
 5. Weekly Report (완료)
 6. Monster System (완료)
-7. Error Museum
-8. AI Coach
-9. Blog Draft Generator
-10. Job Class / Career Path
-11. Dynamic Character UI 고도화
-12. Growth Category Management 고도화
+7. Error Museum (완료)
+8. Game Lobby / App Home UI 정리 (완료)
+9. AI Coach
+10. Blog Draft Generator
+11. Job Class / Career Path
+12. Dynamic Character UI 고도화
+13. Growth Category Management 고도화
 
 ## 진행 메모
 
 - GrowthCategory / GrowthSubCategory 기반 구조는 핵심 성장 모델이다.
 - Quest 완료, GrowthLog, Dashboard 성장판은 이 구조 위에서 동작한다.
 - Dashboard 성장판은 전체 성장 요약, Category별 성장 카드, SubCategory 진행률, 최근 GrowthLog, 최근 완료 Quest를 표시한다.
+- 현재 Dashboard는 앱 홈형 게임 로비로 정리되어 Hero, Level/EXP, 루틴 chip, 빠른 이동 메뉴 중심으로 동작한다.
+- 전체 목록과 CRUD는 Quest, Schedule, Daily Review, Weekly Report, Monster, Error Museum, Growth Settings 각 전용 화면에서 처리한다.
 - 확장 기능은 재미 요소보다 매일 쓰는 흐름을 먼저 만든다.
 - 백둥이 캐릭터는 기능 안내자이자 성장 피드백의 중심으로 유지한다.

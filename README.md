@@ -161,6 +161,15 @@ http://localhost:8080/dashboard
 - `GET /monsters/{id}/edit`: Monster 수정
 - `POST /monsters/{id}/attack`: Monster 수동 공격
 - `POST /monsters/{id}/archive`: Monster 보관
+- `GET /errors`: Error Museum 목록, 상태 필터, 검색
+- `GET /errors/new`: 에러 기록 등록
+- `POST /errors`: 에러 기록 등록 처리
+- `GET /errors/{id}`: 에러 기록 상세
+- `GET /errors/{id}/edit`: 에러 기록 수정
+- `POST /errors/{id}/edit`: 에러 기록 수정 처리
+- `POST /errors/{id}/resolve`: 에러 해결 처리
+- `POST /errors/{id}/archive`: 에러 보관
+- `POST /errors/{id}/delete`: 에러 삭제
 - `GET /growth-categories`: 성장 대분류/중분류 관리
 - `GET /growth-categories/new`: 성장 대분류 추가
 - `GET /growth-categories/{id}/edit`: 성장 대분류 수정
@@ -179,6 +188,8 @@ http://localhost:8080/dashboard
 - Quest 완료 시 GrowthLog 저장
 - EXP 100 이상이면 Level up
 - Dashboard 화면
+- Dashboard 앱 홈형 게임 로비 UI
+- 공통 게임형 네비게이션
 - GrowthCategory/GrowthSubCategory 기반 성장 지도
 - 전체 성장 요약
 - Category별 성장 카드
@@ -201,6 +212,11 @@ http://localhost:8080/dashboard
 - Monster HP progress, 상태, 난이도 표시
 - HP 0 이하 시 Monster 처치 처리
 - Dashboard Monster 전투 요약 표시
+- Error Museum 에러 기록 등록, 조회, 수정, 삭제
+- Error Museum 상태 필터와 키워드 검색
+- Error Museum 해결/보관 처리
+- Dashboard 최근 ErrorRecord 요약 표시
+- Dashboard에서 Error Museum 작성 화면 바로가기
 - 성장 대분류/중분류 추가, 수정, 삭제
 - 백둥이 캐릭터 말풍선 메시지
 
@@ -260,6 +276,11 @@ com.devgwon.growthsimulator
 │   ├── service
 │   └── web
 ├── monster
+│   ├── domain
+│   ├── repository
+│   ├── service
+│   └── web
+├── errorrecord
 │   ├── domain
 │   ├── repository
 │   ├── service
@@ -333,10 +354,12 @@ server:
 - Weekly Report snapshot 저장
 - Monster와 Quest 완료 자동 연동
 - Monster 처치 보상 EXP 실제 반영
+- Error Museum 태그/다대다 연결
+- Blog Draft Generator와 Error Museum 연결
 
 ## 현재 구현 상태
 
-현재 Dashboard는 `DashboardService`에서 화면 데이터를 조립합니다.
+현재 Dashboard는 `DashboardService`에서 화면 데이터를 조립하고, Thymeleaf + `game-ui.css` 기반 앱 홈형 게임 로비로 표시합니다.
 
 - 기본 프로필 조회 또는 생성
 - Profile Level/EXP 진행률 계산
@@ -347,19 +370,20 @@ server:
 - SubCategory별 `totalExp % 100` 기준 진행률 표시
 - 최근 GrowthLog 표시
 - 최근 완료 Quest 표시
-- 진행 중 Quest 완료 버튼 표시
-- 오늘 예정 일정 개수 표시
-- 이번 주 예정 일정 개수 표시
-- 오늘 일정 3개 표시
-- 오늘 회고 작성 여부 표시
-- 최근 Daily Review 표시
-- 이번 주 Weekly Report 요약 표시
-- Monster 전투 요약 표시
+- Dashboard Hero에서 백둥이 말풍선, 추천 액션, Level/EXP 표시
+- Dashboard 루틴 chip으로 Quest, 일정, 회고, Error, Monster 요약 표시
+- Dashboard 빠른 이동 메뉴로 Quest, Schedule, Monster, Error Museum, Daily Review, Weekly Report 이동
 - 백둥이 기본 메시지와 Quest 완료 flash message 표시
 - Schedule 목록/등록/수정/완료/삭제
+- ScheduleType 목록/등록/수정/비활성화
 - Daily Review 목록/작성/상세/수정/삭제
 - Weekly Report 조회형 주간 리포트
 - Monster 목록/등록/상세/수정/수동 공격/보관
+- Error Museum 목록/등록/상세/수정/해결/보관/삭제
+- Error Museum 상태 필터와 키워드 검색
+- Dashboard 최근 ErrorRecord 3개 표시
+- 공통 네비게이션 fragment 적용
+- Schedule, Daily Review, Weekly Report, Growth Settings 화면에 Dashboard 계열 헤더 톤 적용
 
 검증한 내용:
 
@@ -367,4 +391,4 @@ server:
 ./gradlew test
 ```
 
-`/dashboard`, `/schedules`, `/schedules/new`, `/daily-reviews`, `/daily-reviews/new`, `/weekly-reports`, `/monsters`, `/monsters/new` 렌더링은 로컬 Spring Boot 실행 후 HTTP 200으로 확인했습니다.
+`/dashboard`, `/schedules`, `/schedules/new`, `/daily-reviews`, `/daily-reviews/new`, `/weekly-reports`, `/growth-categories`, `/monsters`, `/monsters/new`, `/errors` 렌더링은 로컬 Spring Boot 실행 후 HTTP 200으로 확인했습니다.

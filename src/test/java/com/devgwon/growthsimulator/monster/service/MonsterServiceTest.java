@@ -175,11 +175,16 @@ class MonsterServiceTest {
         )).thenReturn(Optional.of(active));
         when(monsterRepository.findFirstByProfileAndStatusOrderByDefeatedAtDesc(profile, MonsterStatus.DEFEATED))
                 .thenReturn(Optional.of(defeated));
+        when(monsterRepository.findTop3ByProfileAndStatusInOrderByCurrentHpAsc(
+                profile,
+                List.of(MonsterStatus.ACTIVE, MonsterStatus.WEAKENED)
+        )).thenReturn(List.of(active));
 
         DashboardMonsterSummary summary = monsterService.getDashboardSummary();
 
         assertThat(summary.activeMonsterCount()).isEqualTo(1);
         assertThat(summary.almostDefeatedMonster().name()).isEqualTo("불안");
         assertThat(summary.recentDefeatedMonster().name()).isEqualTo("버그");
+        assertThat(summary.activeMonsters()).hasSize(1);
     }
 }

@@ -81,6 +81,7 @@ DB 접속 정보는 우선 아래 기본값으로 둔다. 실제 값이 다르�
 12. Daily Review
 13. Weekly Report
 14. Monster System
+15. Error Museum
 
 아직 아래 기능은 구현하지 않는다.
 
@@ -289,6 +290,31 @@ Monster System은 재미 요소이며 Quest 완료/GrowthLog 핵심 성장 로�
 Monster 처치 보상 EXP는 표시용이며 실제 Profile EXP나 GrowthLog에 반영하지 않는다.
 Quest 완료나 DailyReview 작성과 자동 연동하지 않는다.
 
+### ErrorRecord
+
+Fields:
+
+- id
+- title
+- errorName
+- situation
+- cause
+- solution
+- memo
+- status
+- severity
+- occurredAt
+- resolvedAt
+- createdAt
+- updatedAt
+- relatedGrowthSubCategory
+- relatedQuest
+
+Error Museum은 개발 중 만난 에러와 해결 과정을 성장 수집품처럼 저장하는 기능이다.
+GrowthSubCategory는 필수로 연결하고, Quest는 선택 연결로 둔다.
+ErrorTag, ErrorGrowthLink, ErrorQuestLink 같은 별도 Entity는 아직 만들지 않는다.
+GrowthLog 자동 생성, Monster 자동 연동, AI Coach/Blog Draft Generator 연동은 현재 범위에서 제외한다.
+
 ### ScheduleStatus
 
 Enum:
@@ -319,6 +345,23 @@ Enum:
 - WEAKENED
 - DEFEATED
 - ARCHIVED
+
+### ErrorStatus
+
+Enum:
+
+- OPEN
+- RESOLVED
+- ARCHIVED
+
+### ErrorSeverity
+
+Enum:
+
+- LOW
+- MEDIUM
+- HIGH
+- CRITICAL
 
 ### MonsterDifficulty
 
@@ -382,7 +425,9 @@ Dashboard URL:
 
 - `/dashboard`
 
-Dashboard에는 아래 내용을 보여준다.
+Dashboard는 전체 목록을 길게 보여주는 관리 화면이 아니라 앱 홈형 게임 로비로 구성한다. 상세 목록과 CRUD는 각 기능 화면으로 분리한다.
+
+Dashboard에는 아래 내용을 중심으로 보여준다.
 
 - 캐릭터 말풍선
 - 닉네임
@@ -390,18 +435,14 @@ Dashboard에는 아래 내용을 보여준다.
 - 현재 타이틀
 - Level
 - EXP progress bar
-- GrowthCategory/GrowthSubCategory 성장 카드
-- 전체 성장 요약
-- SubCategory 진행률
-- 최근 GrowthLog
-- 최근 완료 Quest
-- Quest list
-- Quest complete button
-- Add quest button
+- 오늘의 추천 행동
+- 오늘의 루틴 chip
+- Quest, Schedule, Monster, Error Museum, Daily Review, Weekly Report 빠른 이동 메뉴
+- 최근/요약 데이터는 필요한 경우 최대 1~3개만 표시
 
 Dashboard 데이터는 Controller에서 직접 조립하지 않고 `DashboardService` 중심으로 구성한다. Controller는 model attribute 연결과 기본 메시지 처리 정도만 담당한다.
 
-UI는 카드형, 둥근 모서리, 가벼운 색감, 모바일에서도 보기 좋은 레이아웃을 지향한다.
+UI는 백둥이 캐릭터 중심, 둥근 모서리, 부드러운 색감, 모바일에서도 보기 좋은 게임형 앱 홈 레이아웃을 지향한다.
 
 ## Pages
 
@@ -424,6 +465,10 @@ UI는 카드형, 둥근 모서리, 가벼운 색감, 모바일에서도 보기 �
 - `/monsters/new`
 - `/monsters/{id}`
 - `/monsters/{id}/edit`
+- `/errors`
+- `/errors/new`
+- `/errors/{id}`
+- `/errors/{id}/edit`
 
 Action:
 
@@ -449,6 +494,11 @@ Action:
 - `POST /monsters/{id}/edit`
 - `POST /monsters/{id}/attack`
 - `POST /monsters/{id}/archive`
+- `POST /errors`
+- `POST /errors/{id}/edit`
+- `POST /errors/{id}/resolve`
+- `POST /errors/{id}/archive`
+- `POST /errors/{id}/delete`
 
 ## Package Structure
 
@@ -490,6 +540,11 @@ com.devgwon.growthsimulator
 │   ├── service
 │   └── web
 ├── monster
+│   ├── domain
+│   ├── repository
+│   ├── service
+│   └── web
+├── errorrecord
 │   ├── domain
 │   ├── repository
 │   ├── service
@@ -543,7 +598,7 @@ README에는 아래 내용을 포함한다.
 
 ## Current Status
 
-2026-05-14 기준으로 Spring Boot + Thymeleaf MVP와 GrowthCategory 기반 성장판이 구현되어 있다.
+2026-05-21 기준으로 Spring Boot + Thymeleaf MVP, GrowthCategory 기반 성장 구조, Schedule/Daily Review/Weekly Report/Monster/Error Museum, 앱 홈형 Dashboard UI가 구현되어 있다.
 
 생성된 주요 파일:
 
@@ -594,6 +649,17 @@ README에는 아래 내용을 포함한다.
 - `src/main/resources/templates/monsters/list.html`
 - `src/main/resources/templates/monsters/form.html`
 - `src/main/resources/templates/monsters/detail.html`
+- `src/main/java/com/devgwon/growthsimulator/errorrecord/domain/ErrorRecord.java`
+- `src/main/java/com/devgwon/growthsimulator/errorrecord/domain/ErrorStatus.java`
+- `src/main/java/com/devgwon/growthsimulator/errorrecord/domain/ErrorSeverity.java`
+- `src/main/java/com/devgwon/growthsimulator/errorrecord/repository/ErrorRecordRepository.java`
+- `src/main/java/com/devgwon/growthsimulator/errorrecord/service/ErrorRecordService.java`
+- `src/main/java/com/devgwon/growthsimulator/errorrecord/web/ErrorRecordController.java`
+- `src/main/resources/templates/errors/list.html`
+- `src/main/resources/templates/errors/form.html`
+- `src/main/resources/templates/errors/detail.html`
+- `src/main/resources/templates/fragments/navigation.html`
+- `src/main/resources/static/css/game-ui.css`
 - Dashboard 전용 View DTO:
   - `DashboardView`
   - `ProfileProgressView`
@@ -606,11 +672,12 @@ README에는 아래 내용을 포함한다.
   - `DailyReviewSummaryView`
   - `DashboardWeeklyReportSummary`
   - `DashboardMonsterSummary`
+  - `DashboardErrorRecordSummary`
 
 현재 구현된 흐름:
 
 1. `/dashboard` 접속 시 기본 DeveloperProfile과 DeveloperStat을 생성하거나 조회한다.
-2. Dashboard에서 캐릭터 말풍선, Level, EXP, 전체 성장 요약, 성장 지도, 최근 GrowthLog, 최근 완료 Quest, Quest 목록을 보여준다.
+2. Dashboard에서 캐릭터 말풍선, Level, EXP, 오늘의 루틴 chip, 주요 기능 빠른 이동 메뉴를 보여준다.
 3. `/quests/new`에서 GrowthSubCategory를 선택해 Quest를 등록할 수 있다.
 4. `/quests`와 `/dashboard`에서 Quest 목록을 볼 수 있다.
 5. Quest 완료 버튼은 Quest 상태를 `COMPLETED`로 변경하고 Profile EXP, GrowthSubCategory EXP, GrowthLog를 반영한다.
@@ -639,7 +706,16 @@ README에는 아래 내용을 포함한다.
 28. Monster 상세 화면에서 수동 공격으로 HP를 줄일 수 있다.
 29. Monster HP가 0 이하가 되면 `DEFEATED`가 되고, 보관하면 `ARCHIVED`가 된다.
 30. Monster 처치 보상 EXP는 표시용이며 실제 GrowthLog/Profile EXP에는 반영하지 않는다.
-31. Dashboard에서 Monster 전투 수, 처치 직전 Monster, 최근 처치 Monster를 보여준다.
+31. Dashboard에서 Monster 전투 수, 진행 중 Monster 일부, 처치 직전 Monster, 최근 처치 Monster를 보여준다.
+32. `/errors`에서 Error Museum 목록, 상태 필터, 키워드 검색을 사용할 수 있다.
+33. `/errors/new`에서 에러 기록을 작성할 수 있다.
+34. `/errors/{id}`에서 에러 기록 상세를 볼 수 있다.
+35. `/errors/{id}/edit`에서 에러 기록을 수정할 수 있다.
+36. ErrorRecord는 OPEN, RESOLVED, ARCHIVED 상태와 LOW, MEDIUM, HIGH, CRITICAL 심각도를 가진다.
+37. ErrorRecord는 GrowthSubCategory를 필수로 연결하고 Quest는 선택으로 연결한다.
+38. ErrorRecord 해결 처리 시 `resolvedAt`을 자동 기록하고, 보관/삭제 처리를 할 수 있다.
+39. Dashboard에서 최근 ErrorRecord 요약과 Error Museum 작성/이동 액션을 제공한다.
+40. Dashboard, Quest, Monster, Error Museum, Schedule, Daily Review, Weekly Report, Growth Settings는 공통 게임형 네비게이션을 사용한다.
 
 아직 구현하지 않은 핵심 로직:
 
@@ -649,16 +725,18 @@ README에는 아래 내용을 포함한다.
 - Weekly Report snapshot 저장
 - Quest 완료와 Monster 자동 HP 감소 연동
 - Monster 처치 보상 EXP 실제 반영
+- Error Museum 태그/다대다 연결
+- Blog Draft Generator와 Error Museum 연결
 
 검증 상태:
 
 - Java 21은 작업 환경에 설치되어 있다.
 - Gradle Wrapper를 추가했다.
 - `./gradlew test` 실행 결과 빌드가 성공했다.
-- `/dashboard`, `/schedules`, `/schedules/new`, `/daily-reviews`, `/daily-reviews/new`, `/weekly-reports`, `/monsters`, `/monsters/new` 렌더링을 로컬 실행 후 HTTP 200으로 확인했다.
+- `/dashboard`, `/schedules`, `/schedules/new`, `/daily-reviews`, `/daily-reviews/new`, `/weekly-reports`, `/growth-categories`, `/monsters`, `/monsters/new`, `/errors` 렌더링을 로컬 실행 후 HTTP 200으로 확인했다.
 - Schedule 등록, 완료, 삭제 POST 흐름을 수동 확인했다.
 - Daily Review 생성/삭제 POST 흐름을 수동 확인했다.
-- GrowthCategoryService, GrowthSubCategoryService, DashboardService, ScheduleService, ScheduleTypeService, DailyReviewService, WeeklyReportService, MonsterService 단위 테스트를 추가했다.
+- GrowthCategoryService, GrowthSubCategoryService, DashboardService, ScheduleService, ScheduleTypeService, DailyReviewService, WeeklyReportService, MonsterService, ErrorRecordService 단위 테스트를 추가했다.
 
 다음 개발 목표:
 
@@ -666,4 +744,4 @@ README에는 아래 내용을 포함한다.
 2. Daily Review Controller/Form 통합 테스트 추가
 3. 완료 메시지와 Dashboard flash message 흐름 보강
 4. Monster Controller/Form 통합 테스트 추가
-5. Error Museum 구현 계획 수립
+5. Error Museum 태그/블로그 초안 연동 검토

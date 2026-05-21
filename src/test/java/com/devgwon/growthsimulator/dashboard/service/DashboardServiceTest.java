@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 
 import com.devgwon.growthsimulator.character.domain.DeveloperProfile;
 import com.devgwon.growthsimulator.character.service.DeveloperProfileService;
+import com.devgwon.growthsimulator.errorrecord.service.DashboardErrorRecordSummary;
+import com.devgwon.growthsimulator.errorrecord.service.ErrorRecordService;
 import com.devgwon.growthsimulator.growth.domain.GrowthCategory;
 import com.devgwon.growthsimulator.growth.domain.GrowthSubCategory;
 import com.devgwon.growthsimulator.growth.repository.GrowthCategoryRepository;
@@ -62,6 +64,9 @@ class DashboardServiceTest {
 
     @Mock
     private MonsterService monsterService;
+
+    @Mock
+    private ErrorRecordService errorRecordService;
 
     @InjectMocks
     private DashboardService dashboardService;
@@ -131,7 +136,8 @@ class DashboardServiceTest {
                 10,
                 true
         ));
-        when(monsterService.getDashboardSummary()).thenReturn(new DashboardMonsterSummary(0, null, null));
+        when(monsterService.getDashboardSummary()).thenReturn(new DashboardMonsterSummary(0, null, null, List.of()));
+        when(errorRecordService.getDashboardSummary()).thenReturn(new DashboardErrorRecordSummary(0, 0, List.of()));
 
         DashboardView dashboard = dashboardService.getDashboard();
 
@@ -149,5 +155,6 @@ class DashboardServiceTest {
                 .containsExactly("DashboardService 테스트를 작성했다.");
         assertThat(dashboard.weeklyReportSummary().completedQuestCount()).isEqualTo(1);
         assertThat(dashboard.monsterSummary().activeMonsterCount()).isZero();
+        assertThat(dashboard.errorRecordSummary().recentErrors()).isEmpty();
     }
 }
