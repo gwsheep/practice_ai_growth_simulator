@@ -8,9 +8,19 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 - 기존 기능, URL, UI 흐름, 데이터 구조를 임의로 바꾸지 않습니다.
 - 기능 개발 요청이 아니라 문서/하네스 작업인 경우에는 Java 코드, 템플릿, CSS, JS 동작을 변경하지 않습니다.
+- 구조 변경 또는 새 Java 파일 추가 전에는 [docs/architecture.md](docs/architecture.md)를 먼저 확인합니다.
 - Controller에 비즈니스 로직을 넣지 않고, Service 중심 구조를 유지합니다.
+- Controller는 Repository를 직접 호출하지 않습니다.
+- Service는 비즈니스 로직과 트랜잭션을 담당합니다.
+- Repository는 DB 접근만 담당합니다.
+- Entity는 DB 매핑 중심으로 유지하고 API 응답으로 직접 노출하는 새 코드를 만들지 않습니다.
+- 요청 DTO는 `dto/request`, 응답/View DTO는 `dto/response`에 둡니다. DTO를 `service` 패키지에 두지 않습니다.
+- 설정 클래스는 `config`, 예외 클래스는 `exception`, 공통 보조 코드는 `common` 또는 `util`에 둡니다.
 - Dashboard 데이터 조립은 `DashboardService` 중심으로 유지합니다.
 - Quest 완료 로직은 Service에서 처리하고 트랜잭션 경계를 유지합니다.
+- 생성자 주입은 Lombok `@RequiredArgsConstructor`를 선호합니다.
+- Entity에는 Lombok `@Data`를 사용하지 않습니다.
+- DTO에는 필요한 경우 `@Getter` 중심으로 적용하고, `@Setter`, `@Data`, `@EqualsAndHashCode`, `@ToString`은 동작 영향을 검토한 뒤 사용합니다.
 - 사용자에게 보이는 메시지는 한국어로 작성하고, 코드 식별자는 영어로 작성합니다.
 - 도메인 정책이 문서와 코드에서 확인되지 않으면 임의로 만들지 말고 `확인 필요` 또는 TODO로 표시합니다.
 - 대규모 UI 변경은 한 번에 처리하지 말고 작고 검증 가능한 단위로 나눕니다.
@@ -32,6 +42,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - [README.md](README.md): 프로젝트 소개와 실행 안내
 - [docs/project-overview.md](docs/project-overview.md): 현재 구현 범위와 핵심 컨셉
 - [docs/architecture.md](docs/architecture.md): 패키지 구조, 화면 구조, 작업 제약
+- [docs/lombok-policy.md](docs/lombok-policy.md): Lombok 사용 기준과 금지 규칙
 - [docs/domain-policy.md](docs/domain-policy.md): 도메인 규칙과 미정 정책
 - [docs/ui-policy.md](docs/ui-policy.md): 게임형 UI 방향
 - [docs/verification.md](docs/verification.md): 빌드, 테스트, 수동 확인 방법
@@ -40,7 +51,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 ## 작업 후 검증 체크리스트
 
 - 변경 범위가 요청 범위를 벗어나지 않았는지 확인합니다.
-- 기능 변경 시 `./gradlew test`를 실행합니다.
+- 기능 또는 구조 변경 시 `./gradlew clean test`를 실행하고, 가능하면 `./gradlew build`까지 확인합니다.
 - 화면 변경 시 관련 URL을 로컬에서 열어 렌더링과 버튼 동작을 확인합니다.
 - Quest 완료, EXP 증가, GrowthLog 저장, Level up처럼 핵심 성장 흐름을 건드린 경우 관련 테스트를 추가하거나 보강합니다.
 - 문서 변경만 한 경우에도 링크, 경로, 완료 표시 규칙을 확인합니다.

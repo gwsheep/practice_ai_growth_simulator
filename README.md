@@ -34,6 +34,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - PostgreSQL
 - Thymeleaf
 - Bootstrap CDN
+- Lombok
 - Gradle Wrapper
 
 첫 버전에서는 React를 사용하지 않습니다. 현재 저장소에는 `package.json`, Vite, TypeScript 설정이 없습니다.
@@ -102,16 +103,16 @@ docker exec -it <postgres_container> psql -U <db_username> -d <db_name>
 
 ```text
 src/main/java/com/devgwon/growthsimulator
-├── character
-├── dashboard
-├── errorrecord
-├── global
-├── growth
-├── monster
-├── quest
-├── review
-├── schedule
-└── weeklyreport
+├── common
+├── config
+├── controller
+├── dto
+│   ├── request
+│   └── response
+├── entity
+├── exception
+├── repository
+└── service
 
 src/main/resources
 ├── static
@@ -122,10 +123,13 @@ src/main/resources
 
 자세한 구조와 작업 규칙은 [docs/architecture.md](docs/architecture.md)를 참고하세요.
 
+Lombok을 사용하므로 IDE에서 annotation processing을 활성화해야 할 수 있습니다. 자세한 사용 정책은 [docs/lombok-policy.md](docs/lombok-policy.md)를 참고하세요.
+
 ## 관련 문서
 
 - [프로젝트 개요](docs/project-overview.md)
 - [아키텍처와 작업 제약](docs/architecture.md)
+- [Lombok 사용 정책](docs/lombok-policy.md)
 - [도메인 정책](docs/domain-policy.md)
 - [UI 정책](docs/ui-policy.md)
 - [검증 방법](docs/verification.md)

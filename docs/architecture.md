@@ -9,63 +9,43 @@
 - PostgreSQL
 - Thymeleaf
 - Bootstrap CDN
+- Lombok
 - Gradle Wrapper
 
 현재 저장소에는 `package.json`, Vite, TypeScript 설정이 없다. 첫 버전에서는 React를 사용하지 않는다.
 
-## 주요 디렉토리
+## Java 패키지 구조
+
+현재 Java 코드는 feature-based 패키지 대신 Spring Boot 백엔드에서 익숙한 layer-based 패키지로 정리한다.
 
 ```text
 src/main/java/com/devgwon/growthsimulator
-├── character
-│   ├── domain
-│   ├── repository
-│   └── service
-├── dashboard
-│   ├── service
-│   └── web
-├── errorrecord
-│   ├── domain
-│   ├── repository
-│   ├── service
-│   └── web
-├── global
-│   ├── common
-│   ├── config
-│   └── exception
-├── growth
-│   ├── domain
-│   ├── repository
-│   ├── service
-│   └── web
-├── monster
-│   ├── domain
-│   ├── repository
-│   ├── service
-│   └── web
-├── quest
-│   ├── domain
-│   ├── repository
-│   ├── service
-│   └── web
-├── review
-│   ├── domain
-│   ├── repository
-│   ├── service
-│   └── web
-├── schedule
-│   ├── domain
-│   ├── repository
-│   ├── service
-│   └── web
-└── weeklyreport
-    ├── service
-    └── web
+├── GrowthSimulatorApplication.java
+├── common
+├── config
+├── controller
+├── dto
+│   ├── request
+│   └── response
+├── entity
+├── exception
+├── repository
+└── service
 ```
+
+테스트 코드는 현재 Service 단위 테스트 중심이다.
+
+```text
+src/test/java/com/devgwon/growthsimulator
+└── service
+```
+
+## 리소스 구조
 
 ```text
 src/main/resources
-├── application.yml
+├── application-example.yml
+├── application.yml          # 로컬 전용, Git 추적 제외
 ├── static
 │   ├── css
 │   └── js
@@ -83,25 +63,50 @@ src/main/resources
     └── weekly-reports
 ```
 
-## 계층 역할
+## 패키지 역할
 
-- `domain`: JPA Entity와 enum
-- `repository`: Spring Data JPA Repository
-- `service`: 비즈니스 로직, 화면 DTO 조립, 트랜잭션 처리
-- `web`: Spring MVC Controller
-- `templates`: Thymeleaf 화면
-- `static/css`, `static/js`: 화면 스타일과 최소 JavaScript
-- `global`: 공통 설정, 예외 처리, 공통 패키지
+- `controller`: Spring MVC Controller. 요청 매핑, form binding, redirect, Model attribute 연결만 담당한다.
+- `service`: 비즈니스 로직, 트랜잭션, Entity 조회/저장 흐름, View DTO 조립을 담당한다.
+- `repository`: Spring Data JPA Repository. DB 접근 메서드만 둔다.
+- `entity`: JPA Entity와 enum. DB 매핑과 도메인 상태 변경 메서드를 둔다.
+- `dto/request`: 화면 form 또는 요청 입력 객체. 예: `QuestCreateRequest`, `ScheduleUpdateRequest`.
+- `dto/response`: 화면 View DTO, summary DTO, result DTO. 예: `DashboardView`, `QuestCompleteResult`.
+- `config`: Spring 설정과 seed data initializer.
+- `exception`: 전역 예외 처리와 custom exception.
+- `common`: 전역 공통 타입. 상태를 가지는 비즈니스 로직은 두지 않는다.
+
+Lombok 사용 기준은 [lombok-policy.md](lombok-policy.md)를 따른다.
+
+## 의존 방향
+
+권장 의존 방향:
+
+```text
+controller -> service -> repository -> entity
+controller -> dto/request, dto/response
+service -> dto/request, dto/response, entity
+repository -> entity
+config -> service/repository/entity
+exception -> exception 대상 타입
+```
+
+금지하거나 피해야 하는 방향:
+
+- `controller -> repository` 직접 호출 금지
+- `repository -> service` 의존 금지
+- `entity -> controller/service/dto` 의존 금지
+- `dto -> service/repository` 의존 금지
+- `service` 패키지에 request/response DTO 배치 금지
 
 ## 데이터 흐름
 
 일반 CRUD 흐름:
 
 1. Controller가 요청을 받는다.
-2. Controller는 입력 DTO 또는 form 객체를 Service에 전달한다.
+2. Controller는 request DTO 또는 form 객체를 Service에 전달한다.
 3. Service가 Repository를 통해 Entity를 조회/저장한다.
-4. Service가 View DTO를 조립한다.
-5. Controller는 Model에 View DTO를 넣고 Thymeleaf template을 반환한다.
+4. Service가 필요한 response/View DTO를 조립한다.
+5. Controller는 Model에 DTO를 넣고 Thymeleaf template을 반환한다.
 
 Quest 완료 흐름:
 
@@ -122,17 +127,29 @@ Quest 완료 흐름:
 - 공통 네비게이션은 `templates/fragments/navigation.html`을 사용한다.
 - Quest, Schedule, Daily Review, Weekly Report, Monster, Error Museum, Growth Settings는 각 전용 template 디렉토리를 가진다.
 
-## 작업 제약
+## 새 파일 위치 기준
 
-- Controller에 비즈니스 로직을 추가하지 않는다.
-- Dashboard 화면 데이터 조립은 Controller가 아니라 `DashboardService`에서 처리한다.
-- Quest 완료는 Service 트랜잭션 안에서 처리한다.
-- UI 컴포넌트와 도메인 로직을 과도하게 섞지 않는다.
-- 공통 UI 조각은 재사용 가능한 fragment 또는 공통 CSS로 분리한다.
-- 상태 관리 위치를 임의로 분산하지 않는다. 현재는 서버 렌더링 중심이며 클라이언트 상태 관리는 최소 JavaScript로 제한한다.
-- 파일명과 디렉토리 네이밍은 기존 feature-based package structure를 유지한다.
-- 대규모 UI 변경은 한 번에 하지 않는다. Dashboard, 공통 navigation, 각 기능 화면을 분리해서 다룬다.
-- 새로운 외부 도구, 프론트엔드 프레임워크, compose 파일은 요구가 명확할 때만 도입한다.
+- 새 Controller: `controller`
+- 새 Service: `service`
+- 새 Repository: `repository`
+- 새 JPA Entity 또는 enum: `entity`
+- 새 form/create/update request 객체: `dto/request`
+- 새 화면 표시용 View/Summary/Result DTO: `dto/response`
+- Spring 설정, `ApplicationRunner` seed data: `config`
+- custom exception 또는 `@ControllerAdvice`: `exception`
+- 여러 계층에서 공유하는 상수/간단한 공통 타입: `common`
+- 상태 없는 순수 보조 함수가 필요할 때: `util` 패키지 생성 검토
+
+## 금지 규칙
+
+- Controller에서 Repository를 직접 호출하지 않는다.
+- Controller에서 트랜잭션성 비즈니스 로직을 처리하지 않는다.
+- Service 패키지에 DTO, Form, View, Summary, Result 클래스를 새로 만들지 않는다.
+- Entity를 새 API 응답이나 화면 응답 DTO 대신 직접 확장해서 사용하지 않는다.
+- Entity에 Lombok `@Data`를 사용하지 않는다.
+- DB 테이블 구조, URL, request field, response field는 구조 정리 중 임의로 변경하지 않는다.
+- 대규모 구조 변경과 기능 변경을 한 커밋에 섞지 않는다.
+- 민감 정보가 들어 있는 설정 파일을 커밋하지 않는다.
 
 ## 구조 변경 시 주의사항
 
@@ -142,3 +159,8 @@ Quest 완료 흐름:
 - Schedule 완료는 EXP/GrowthLog를 발생시키지 않는다.
 - Daily Review 작성은 EXP/GrowthLog를 발생시키지 않는다.
 - Error Museum은 GrowthSubCategory 필수, Quest 선택 연결 구조를 유지한다.
+
+## 확인 필요
+
+- 현재 Thymeleaf 화면 중심 프로젝트라 `dto/response`에는 API response뿐 아니라 View DTO도 함께 둔다.
+- 추후 REST API가 추가되면 `dto/response` 안에서 API 응답과 화면 View DTO를 더 나눌지 검토한다.

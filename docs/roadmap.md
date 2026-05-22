@@ -384,6 +384,28 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 
+1. Java/Spring layer-based 패키지 구조 정리 (완료)
+2. Lombok 의존성 추가와 생성자 주입 정리 (완료)
+3. `QuestService.completeQuest` 트랜잭션 테스트 추가
+4. Daily Review Controller/Form 통합 테스트 추가
+5. 완료 메시지와 Dashboard flash message 흐름 보강
+6. Monster Controller/Form 통합 테스트 추가
+7. Error Museum Controller/Form 통합 테스트 추가
+8. Error Museum 태그 정책 초안 작성
+9. Blog Draft Generator 템플릿 기반 초안 설계
+10. AI Coach Fake client 설계
+11. Dynamic Character UI 고도화 범위 확정
+12. application.yml 민감 정보 처리 방식 정리 (완료)
+
+## 구조 개선 TODO
+
+- `dto/response`에 화면 View DTO와 result DTO가 함께 있다. REST API가 추가되면 `dto/view` 또는 `dto/internal` 분리 여부 확인 필요.
+- Controller/Form 통합 테스트가 부족하다. 패키지 이동 이후 주요 화면 POST/redirect 흐름 테스트 보강 필요.
+- `service` 패키지가 기능별 하위 패키지 없이 평면 구조다. 클래스가 더 늘어나면 `service/quest`, `service/schedule` 같은 가벼운 하위 분리 검토 필요.
+- 단순 DTO의 Lombok 적용은 아직 전체 변환하지 않았다. Thymeleaf form binding 동작을 확인하며 파일별로 검토 필요.
+
+<!-- 이전 번호 목록 보존용 메모: 아래 항목은 위 작은 작업 단위 목록으로 재정리했다. -->
+<!--
 1. `QuestService.completeQuest` 트랜잭션 테스트 추가
 2. Daily Review Controller/Form 통합 테스트 추가
 3. 완료 메시지와 Dashboard flash message 흐름 보강
@@ -394,6 +416,7 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 8. AI Coach Fake client 설계
 9. Dynamic Character UI 고도화 범위 확정
 10. application.yml 민감 정보 처리 방식 정리 (완료)
+-->
 
 ## 확인 필요 항목
 
