@@ -18,6 +18,8 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - 설정 클래스는 `config`, 예외 클래스는 `exception`, 공통 보조 코드는 `common` 또는 `util`에 둡니다.
 - Dashboard 데이터 조립은 `DashboardService` 중심으로 유지합니다.
 - Quest 완료 로직은 Service에서 처리하고 트랜잭션 경계를 유지합니다.
+- AI Coach는 Controller에서 Client를 직접 호출하지 않고 `AiCoachService`를 거칩니다.
+- 실제 AI API, 외부 네트워크 호출, API Key, AI 관련 의존성은 사용자가 명시적으로 요청하고 정책 문서가 갱신되기 전까지 추가하지 않습니다.
 - 생성자 주입은 Lombok `@RequiredArgsConstructor`를 선호합니다.
 - Entity에는 Lombok `@Data`를 사용하지 않습니다.
 - DTO에는 필요한 경우 `@Getter` 중심으로 적용하고, `@Setter`, `@Data`, `@EqualsAndHashCode`, `@ToString`은 동작 영향을 검토한 뒤 사용합니다.

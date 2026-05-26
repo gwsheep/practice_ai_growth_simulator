@@ -15,6 +15,7 @@ import com.devgwon.growthsimulator.service.MonsterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,10 +50,23 @@ public class MonsterController {
 
             @ModelAttribute("monsterForm") MonsterCreateRequest request,
 
+            BindingResult bindingResult,
+
+            Model model,
+
             RedirectAttributes redirectAttributes
 
     ) {
-        Monster monster = monsterService.create(request);
+        if (bindingResult.hasErrors()) {
+            return createForm(model);
+        }
+        Monster monster;
+        try {
+            monster = monsterService.create(request);
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("monster.invalid", exception.getMessage());
+            return createForm(model);
+        }
         redirectAttributes.addFlashAttribute("noticeMessage", "새 몬스터가 등장했습니다.");
         return "redirect:/monsters/" + monster.getId();
     }
@@ -81,10 +95,22 @@ public class MonsterController {
 
             @ModelAttribute("monsterForm") MonsterUpdateRequest request,
 
+            BindingResult bindingResult,
+
+            Model model,
+
             RedirectAttributes redirectAttributes
 
     ) {
-        monsterService.update(id, request);
+        if (bindingResult.hasErrors()) {
+            return updateForm(id, model);
+        }
+        try {
+            monsterService.update(id, request);
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("monster.invalid", exception.getMessage());
+            return updateForm(id, model);
+        }
         redirectAttributes.addFlashAttribute("noticeMessage", "몬스터 정보가 수정되었습니다.");
         return "redirect:/monsters/" + id;
     }
@@ -109,6 +135,19 @@ public class MonsterController {
         monsterService.archive(id);
         redirectAttributes.addFlashAttribute("noticeMessage", "몬스터를 보관함으로 이동했습니다.");
         return "redirect:/monsters";
+    }
+
+    private String createForm(Model model) {
+        model.addAttribute("editMode", false);
+        addFormOptions(model);
+        return "monsters/form";
+    }
+
+    private String updateForm(Long id, Model model) {
+        model.addAttribute("monster", monsterService.getMonster(id));
+        model.addAttribute("editMode", true);
+        addFormOptions(model);
+        return "monsters/form";
     }
 
     private void addFormOptions(Model model) {

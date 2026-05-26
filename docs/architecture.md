@@ -33,10 +33,11 @@ src/main/java/com/devgwon/growthsimulator
 └── service
 ```
 
-테스트 코드는 현재 Service 단위 테스트 중심이다.
+테스트 코드는 Service 테스트와 Controller/Form 통합 테스트를 함께 둔다.
 
 ```text
 src/test/java/com/devgwon/growthsimulator
+├── controller
 └── service
 ```
 
@@ -50,6 +51,7 @@ src/main/resources
 │   ├── css
 │   └── js
 └── templates
+    ├── ai-coach
     ├── dashboard
     ├── daily-reviews
     ├── errors
@@ -120,12 +122,23 @@ Quest 완료 흐름:
 8. Level up 여부 계산
 9. 결과 메시지 반환
 
+AI Coach Fake Client MVP 흐름:
+
+1. Controller가 `/ai-coach` 요청을 받는다.
+2. Controller는 `AiCoachService`에서 화면 데이터를 조회한다.
+3. Service는 DailyReview, Quest, GrowthLog 데이터를 최소 범위로 조회한다.
+4. Service는 `AiCoachClient` 인터페이스를 통해 규칙 기반 코칭 응답을 요청한다.
+5. 현재 구현체는 외부 API를 호출하지 않는 `FakeAiCoachClient`다.
+6. Client 응답 실패 시 Service가 기본 백둥이 fallback 메시지를 사용한다.
+7. Controller는 `AiCoachView`를 Model에 담아 Thymeleaf template을 반환한다.
+
 ## 화면 구조
 
 - Dashboard는 `DashboardController`와 `DashboardService`를 중심으로 동작한다.
 - Dashboard template은 `templates/dashboard/index.html`이다.
 - 공통 네비게이션은 `templates/fragments/navigation.html`을 사용한다.
 - Quest, Schedule, Daily Review, Weekly Report, Monster, Error Museum, Growth Settings는 각 전용 template 디렉토리를 가진다.
+- AI Coach 화면은 `templates/ai-coach/index.html`을 사용한다.
 
 ## 새 파일 위치 기준
 
@@ -143,6 +156,7 @@ Quest 완료 흐름:
 ## 금지 규칙
 
 - Controller에서 Repository를 직접 호출하지 않는다.
+- AI Coach Controller에서 `AiCoachClient`를 직접 호출하지 않는다.
 - Controller에서 트랜잭션성 비즈니스 로직을 처리하지 않는다.
 - Service 패키지에 DTO, Form, View, Summary, Result 클래스를 새로 만들지 않는다.
 - Entity를 새 API 응답이나 화면 응답 DTO 대신 직접 확장해서 사용하지 않는다.
@@ -150,6 +164,7 @@ Quest 완료 흐름:
 - DB 테이블 구조, URL, request field, response field는 구조 정리 중 임의로 변경하지 않는다.
 - 대규모 구조 변경과 기능 변경을 한 커밋에 섞지 않는다.
 - 민감 정보가 들어 있는 설정 파일을 커밋하지 않는다.
+- 실제 AI API 호출, 외부 네트워크 호출, AI API Key 설정, AI 관련 의존성은 명시적 정책 확정 전에는 추가하지 않는다.
 
 ## 구조 변경 시 주의사항
 

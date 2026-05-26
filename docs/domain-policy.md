@@ -196,9 +196,29 @@ ErrorSeverity:
 - ErrorTag, ErrorGrowthLink, ErrorQuestLink 같은 별도 Entity는 아직 만들지 않는다.
 - GrowthLog 자동 생성, Monster 자동 연동, AI Coach/Blog Draft Generator 연동은 현재 범위에서 제외한다.
 
+## AI Coach
+
+AI Coach는 DailyReview, Quest, GrowthLog를 기반으로 백둥이의 코칭 메시지와 다음 행동 추천을 제공한다.
+
+MVP 정책:
+
+- 실제 AI API를 호출하지 않는다.
+- OpenAI API Key, token, 외부 네트워크 호출, OpenAI 관련 의존성을 추가하지 않는다.
+- 사용자 DailyReview/Quest/GrowthLog 데이터를 외부로 전송하지 않는다.
+- `AiCoachClient` 인터페이스를 두고, 현재 구현은 `FakeAiCoachClient`의 규칙 기반 메시지만 사용한다.
+- Controller는 `AiCoachClient`를 직접 호출하지 않고 `AiCoachService`를 통해 화면 데이터를 조회한다.
+- Fake client 실패 시 기본 백둥이 메시지로 fallback한다.
+- MVP에서는 AiCoachMessage 같은 저장형 Entity를 만들지 않고 조회형 화면으로 시작한다.
+
+확인 필요:
+
+- 향후 실제 AI API 연동 시 사용자 기록 전송 동의와 익명화 정책
+- AI Coach 메시지 저장 여부와 보관 기간
+- 추천 Quest를 실제 Quest 생성 흐름과 연결할지 여부
+
 ## 정책 확인 필요
 
-- AI Coach의 Entity와 저장 정책
+- AI Coach의 실제 AI 연동 시 Entity와 저장 정책
 - Job Class/Career Path가 DeveloperProfile.title과 공존하는 방식
 - Blog Draft Generator의 저장형 Entity 범위
 - Dynamic Character UI의 CharacterState/CharacterMessageTemplate 도입 여부

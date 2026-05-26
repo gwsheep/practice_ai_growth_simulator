@@ -95,6 +95,7 @@ http://localhost:8080/dashboard
 - `/monsters/new`
 - `/errors`
 - `/errors/new`
+- `/ai-coach`
 
 핵심 흐름:
 
@@ -115,6 +116,7 @@ http://localhost:8080/dashboard
 - Monster 등록/수정/수동 공격/보관
 - ErrorRecord 등록/수정/해결/보관/삭제
 - Error Museum 상태 필터와 검색
+- AI Coach 최근 성장 요약, 회고 요약, 응원 메시지, 다음 행동 추천 표시
 
 ## 화면 변경 시 확인할 항목
 
@@ -131,6 +133,7 @@ http://localhost:8080/dashboard
 - 핵심 성장 흐름 변경 시 단위 테스트 또는 통합 테스트를 추가한다.
 - EXP/GrowthLog 발생 정책이 [domain-policy.md](docs/domain-policy.md)와 맞는지 확인한다.
 - 새 route를 추가했다면 README 또는 관련 docs에 링크를 반영한다.
+- AI Coach 관련 변경 시 외부 API 호출, API Key 설정, AI 의존성이 추가되지 않았는지 확인한다.
 
 ## 문제 해결
 
@@ -179,5 +182,14 @@ server:
 - Schedule 등록, 완료, 삭제 POST 흐름 수동 확인
 - Daily Review 생성/삭제 POST 흐름 수동 확인
 - 주요 Service 단위 테스트 추가
+- Quest 완료 트랜잭션 테스트 추가
+- Daily Review Controller/Form 통합 테스트 추가
+- Monster Controller/Form 통합 테스트 추가
+- AI Coach Fake Client MVP Service/Controller 테스트 추가
+
+최근 문서 반영 시점의 검증 기록:
+
+- `./gradlew clean test` 성공
+- 실행 중 `/usr/lib/jvm/openjdk-21` 경로가 유효하지 않다는 Gradle 경고가 표시되었으나 테스트는 통과함
 
 이 기록은 과거 시점의 검증 결과다. 현재 상태에서 릴리스 또는 큰 변경 전에는 다시 실행해 확인한다.

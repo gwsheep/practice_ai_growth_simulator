@@ -9,6 +9,7 @@ import com.devgwon.growthsimulator.service.GrowthSubCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,10 +51,23 @@ public class DailyReviewController {
 
             @ModelAttribute("reviewForm") DailyReviewCreateRequest request,
 
+            BindingResult bindingResult,
+
+            Model model,
+
             RedirectAttributes redirectAttributes
 
     ) {
-        DailyReview review = dailyReviewService.create(request);
+        if (bindingResult.hasErrors()) {
+            return createForm(model);
+        }
+        DailyReview review;
+        try {
+            review = dailyReviewService.create(request);
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("dailyReview.invalid", exception.getMessage());
+            return createForm(model);
+        }
         redirectAttributes.addFlashAttribute("noticeMessage", "오늘의 회고가 저장되었습니다.");
         return "redirect:/daily-reviews/" + review.getId();
     }
@@ -81,10 +95,22 @@ public class DailyReviewController {
 
             @ModelAttribute("reviewForm") DailyReviewUpdateRequest request,
 
+            BindingResult bindingResult,
+
+            Model model,
+
             RedirectAttributes redirectAttributes
 
     ) {
-        dailyReviewService.update(id, request);
+        if (bindingResult.hasErrors()) {
+            return updateForm(id, model);
+        }
+        try {
+            dailyReviewService.update(id, request);
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("dailyReview.invalid", exception.getMessage());
+            return updateForm(id, model);
+        }
         redirectAttributes.addFlashAttribute("noticeMessage", "회고가 수정되었습니다.");
         return "redirect:/daily-reviews/" + id;
     }
@@ -94,6 +120,19 @@ public class DailyReviewController {
         dailyReviewService.delete(id);
         redirectAttributes.addFlashAttribute("noticeMessage", "회고가 삭제되었습니다.");
         return "redirect:/daily-reviews";
+    }
+
+    private String createForm(Model model) {
+        model.addAttribute("editMode", false);
+        addFormOptions(model);
+        return "daily-reviews/form";
+    }
+
+    private String updateForm(Long id, Model model) {
+        model.addAttribute("review", dailyReviewService.get(id));
+        model.addAttribute("editMode", true);
+        addFormOptions(model);
+        return "daily-reviews/form";
     }
 
     private void addFormOptions(Model model) {

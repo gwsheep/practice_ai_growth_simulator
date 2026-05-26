@@ -4,7 +4,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 사용자는 Quest를 완료하고 EXP를 얻으며, Level up하고, AI + 백엔드 개발자로서 성장한다. UI는 무거운 관리자 페이지가 아니라 백둥이가 말풍선으로 안내하는 밝고 가벼운 성장 시뮬레이터를 지향한다.
 
-현재 핵심 구조는 `DeveloperProfile`, `Quest`, `GrowthCategory`, `GrowthSubCategory`, `GrowthLog`, `Schedule`, `DailyReview`, `WeeklyReport`, `Monster`, `ErrorRecord`, `CharacterMessageService`, `Dashboard`, Thymeleaf 기반 UI, PostgreSQL 로컬 DB를 중심으로 한다.
+현재 핵심 구조는 `DeveloperProfile`, `Quest`, `GrowthCategory`, `GrowthSubCategory`, `GrowthLog`, `Schedule`, `DailyReview`, `WeeklyReport`, `Monster`, `ErrorRecord`, `CharacterMessageService`, `Dashboard`, `AiCoachService`, Thymeleaf 기반 UI, PostgreSQL 로컬 DB를 중심으로 한다.
 
 성장 항목은 고정 필드가 아니라 `GrowthCategory` / `GrowthSubCategory` 기반으로 관리한다.
 
@@ -303,12 +303,12 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 주요 기능 후보:
 
-- 오늘의 응원 메시지 생성
-- Quest 추천
-- Daily Review 요약
+- 오늘의 응원 메시지 생성 (Fake Client MVP 완료)
+- Quest 추천 (Fake Client MVP 완료)
+- Daily Review 요약 (Fake Client MVP 완료)
 - Weekly Report 코멘트
 - 성장 정체 구간 안내
-- FakeAiCoachClient 기반 초기 구현
+- FakeAiCoachClient 기반 초기 구현 (완료)
 - OpenAI API 연동 확장
 
 예상 Entity:
@@ -319,8 +319,9 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 주의사항:
 
-- 초기에는 `FakeAiCoachClient`로 시작한다.
-- OpenAI API Key는 환경변수로 관리한다.
+- 초기에는 `FakeAiCoachClient`로 시작한다. (완료)
+- 현재 MVP는 실제 AI API를 호출하지 않고, 사용자 기록을 외부로 전송하지 않는다.
+- 실제 AI API 연동 시에만 API Key 관리 방식을 별도 정책으로 확정한다.
 - Controller에서 직접 API를 호출하지 않는다.
 - AI 응답 실패 시에도 기본 백둥이 메시지로 fallback되어야 한다.
 
@@ -386,16 +387,17 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 
 1. Java/Spring layer-based 패키지 구조 정리 (완료)
 2. Lombok 의존성 추가와 생성자 주입 정리 (완료)
-3. `QuestService.completeQuest` 트랜잭션 테스트 추가
-4. Daily Review Controller/Form 통합 테스트 추가
+3. `QuestService.completeQuest` 트랜잭션 테스트 추가 (완료)
+4. Daily Review Controller/Form 통합 테스트 추가 (완료)
 5. 완료 메시지와 Dashboard flash message 흐름 보강
-6. Monster Controller/Form 통합 테스트 추가
+6. Monster Controller/Form 통합 테스트 추가 (완료)
 7. Error Museum Controller/Form 통합 테스트 추가
 8. Error Museum 태그 정책 초안 작성
 9. Blog Draft Generator 템플릿 기반 초안 설계
-10. AI Coach Fake client 설계
-11. Dynamic Character UI 고도화 범위 확정
-12. application.yml 민감 정보 처리 방식 정리 (완료)
+10. AI Coach Fake client 설계 (완료)
+11. AI Coach Fake Client MVP 구현 (완료)
+12. Dynamic Character UI 고도화 범위 확정
+13. application.yml 민감 정보 처리 방식 정리 (완료)
 
 ## 구조 개선 TODO
 
@@ -414,8 +416,9 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 6. Error Museum 태그 정책 초안 작성
 7. Blog Draft Generator 템플릿 기반 초안 설계
 8. AI Coach Fake client 설계
-9. Dynamic Character UI 고도화 범위 확정
-10. application.yml 민감 정보 처리 방식 정리 (완료)
+9. AI Coach Fake Client MVP 구현
+10. Dynamic Character UI 고도화 범위 확정
+11. application.yml 민감 정보 처리 방식 정리 (완료)
 -->
 
 ## 확인 필요 항목
@@ -424,9 +427,7 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 - 로컬 `application.yml`의 실제 DB 값이 작업자 환경에서 올바른지 여부
 - Dynamic Character UI 최상위 완료 여부
 - 하단 네비게이션 요구와 현재 공통 navigation fragment 구현의 차이
-- Quest 완료 트랜잭션 테스트 존재 여부
-- Daily Review Controller/Form 통합 테스트 존재 여부
-- Monster Controller/Form 통합 테스트 존재 여부
+- 실제 AI Coach API 연동 시 사용자 동의, 익명화, 저장 기간, API Key 관리 정책
 
 ## 추천 구현 순서
 
@@ -438,19 +439,24 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 6. Monster System (완료)
 7. Error Museum (완료)
 8. Game Lobby / App Home UI 정리 (완료)
-9. Quest 완료 트랜잭션 테스트
-10. Daily Review Controller/Form 통합 테스트
-11. Monster Controller/Form 통합 테스트
-12. AI Coach
-13. Blog Draft Generator
-14. Job Class / Career Path
-15. Dynamic Character UI 고도화
-16. Growth Category Management 고도화
+9. Quest 완료 트랜잭션 테스트 (완료)
+10. Daily Review Controller/Form 통합 테스트 (완료)
+11. Monster Controller/Form 통합 테스트 (완료)
+12. AI Coach Fake Client MVP (완료)
+13. Error Museum Controller/Form 통합 테스트
+14. Blog Draft Generator
+15. Job Class / Career Path
+16. Dynamic Character UI 고도화
+17. Growth Category Management 고도화
 
 ## 진행 메모
 
 - GrowthCategory / GrowthSubCategory 기반 구조는 핵심 성장 모델이다.
 - Quest 완료, GrowthLog, Dashboard 성장판은 이 구조 위에서 동작한다.
+- Quest 완료 트랜잭션 테스트는 PostgreSQL 기반 `QuestServiceTransactionTest`에서 성공, 롤백, 중복 완료, 미존재 Quest를 검증한다.
+- Daily Review Controller/Form 통합 테스트는 PostgreSQL 기반 `DailyReviewControllerTest`에서 목록/상세/수정 폼, 생성/수정/삭제 성공, 생성/수정 validation 실패 시 form 반환을 검증한다.
+- Monster Controller/Form 통합 테스트는 PostgreSQL 기반 `MonsterControllerTest`에서 목록/상세/생성/수정 폼, 생성/수정 validation 실패 시 form 반환, 공격/처치/보관 흐름을 검증한다.
+- AI Coach Fake Client MVP는 `/ai-coach`에서 DailyReview, Quest, GrowthLog 기반 규칙 메시지와 다음 행동 추천을 제공하며, 외부 AI API와 사용자 데이터 외부 전송은 사용하지 않는다.
 - Dashboard 성장판은 전체 성장 요약, Category별 성장 카드, SubCategory 진행률, 최근 GrowthLog, 최근 완료 Quest를 표시한다.
 - 현재 Dashboard는 앱 홈형 게임 로비로 정리되어 Hero, Level/EXP, 루틴 chip, 빠른 이동 메뉴 중심으로 동작한다.
 - 전체 목록과 CRUD는 Quest, Schedule, Daily Review, Weekly Report, Monster, Error Museum, Growth Settings 각 전용 화면에서 처리한다.

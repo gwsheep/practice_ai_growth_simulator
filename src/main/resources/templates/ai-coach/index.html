@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>백둥이 AI Coach</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/game-ui.css}">
+</head>
+<body>
+<main class="container page-shell app-shell py-4">
+    <nav th:replace="~{fragments/navigation :: nav('ai-coach')}"></nav>
+
+    <section class="game-hero mb-4">
+        <div class="mascot-panel">
+            <div class="office-character" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </div>
+            <div>
+                <span class="game-hero__eyebrow">AI COACH MVP</span>
+                <p class="speech-bubble mb-2" th:text="${coach.coachMessage}">오늘은 작은 퀘스트 하나만 깨도 충분해요.</p>
+                <h1 class="h3 mb-1">백둥이 AI Coach</h1>
+                <p class="text-muted mb-0">이번 MVP는 외부 AI API 없이 내 기록만 보고 규칙 기반으로 안내합니다.</p>
+            </div>
+        </div>
+        <div class="game-hero__stats">
+            <article class="stat-card">
+                <span>Coach Mode</span>
+                <strong th:text="${coach.fallback ? '기본' : 'Fake'}">Fake</strong>
+                <small>외부 전송 없음</small>
+            </article>
+            <a class="action-button" th:href="@{/quests/new}">Quest 만들기</a>
+        </div>
+    </section>
+
+    <div th:if="${coach.empty}" class="alert alert-info">
+        아직 코칭할 기록이 적어요. Quest 완료나 Daily Review를 남기면 백둥이가 더 구체적으로 안내할 수 있어요.
+    </div>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-lg-6">
+            <article class="game-card h-100">
+                <h2 class="section-title mb-3">최근 성장 요약</h2>
+                <p class="text-muted mb-0" th:text="${coach.growthSummary}">최근 성장 요약</p>
+            </article>
+        </div>
+        <div class="col-12 col-lg-6">
+            <article class="game-card h-100">
+                <h2 class="section-title mb-3">최근 회고 요약</h2>
+                <p class="text-muted mb-0" th:text="${coach.reviewSummary}">최근 회고 요약</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="row g-3">
+        <div class="col-12 col-lg-5">
+            <article class="soft-card h-100">
+                <h2 class="section-title mb-3">오늘의 응원</h2>
+                <p class="mb-0 text-muted" th:text="${coach.encouragementMessage}">응원 메시지</p>
+            </article>
+        </div>
+        <div class="col-12 col-lg-7">
+            <article class="soft-card h-100">
+                <h2 class="section-title mb-3">다음 행동 추천</h2>
+                <div class="quest-list">
+                    <article class="quest-item" th:each="action : ${coach.recommendedActions}">
+                        <div class="quest-main">
+                            <strong class="quest-title" th:text="${action}">작은 Quest 하나 확인하기</strong>
+                        </div>
+                    </article>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

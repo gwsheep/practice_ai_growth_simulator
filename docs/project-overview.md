@@ -15,6 +15,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - Schedule로 계획을 잡고, Daily Review로 하루를 회고하고, Weekly Report로 한 주를 확인한다.
 - Monster는 스트레스와 문제를 게임 요소로 표현한다.
 - Error Museum은 개발 중 만난 에러와 해결 과정을 성장 수집품처럼 저장한다.
+- AI Coach는 Daily Review, Quest, GrowthLog를 기반으로 백둥이의 규칙 기반 코칭 메시지를 보여준다.
 
 ## 현재 구현된 주요 내용
 
@@ -29,6 +30,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - 조회형 Weekly Report
 - Monster 목록/등록/상세/수정/수동 공격/보관
 - Error Museum 목록/등록/상세/수정/해결/보관/삭제
+- AI Coach Fake Client MVP 화면
 - 공통 게임형 네비게이션 fragment
 - `game-ui.css`, `dashboard.css`, `dashboard.js`, `quest-form.js`
 
@@ -48,6 +50,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - `/weekly-reports`, `/weekly-reports/current`
 - `/monsters`, `/monsters/new`, `/monsters/{id}`, `/monsters/{id}/edit`
 - `/errors`, `/errors/new`, `/errors/{id}`, `/errors/{id}/edit`
+- `/ai-coach`: 백둥이 AI Coach
 
 ## MVP 범위
 
@@ -62,12 +65,14 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 MVP에서 제외하는 기능:
 
-- AI API 연동
+- 실제 AI API 연동
 - Job Class 전직 시스템
 - 로그인/회원가입
 - 멀티 유저
 - React 프론트엔드
 - 복잡한 차트
+
+AI Coach MVP는 현재 Fake/Rule 기반 메시지만 제공한다. 실제 AI API 호출, API Key 설정, 외부 네트워크 호출, 사용자 기록 외부 전송은 제외한다.
 
 ## 확인 필요
 

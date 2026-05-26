@@ -54,6 +54,10 @@
               th:object="${monsterForm}"
               th:action="${editMode} ? @{/monsters/{id}/edit(id=${monster.id})} : @{/monsters}"
               method="post">
+            <div th:if="${#fields.hasAnyErrors()}" class="alert alert-warning">
+                <div th:each="error : ${#fields.errors('*')}" th:text="${error}">입력값을 확인해 주세요.</div>
+            </div>
+
             <div>
                 <label class="form-label" for="name">이름</label>
                 <input class="form-control" id="name" type="text" th:field="*{name}" placeholder="예: 레거시 코드 늪">
