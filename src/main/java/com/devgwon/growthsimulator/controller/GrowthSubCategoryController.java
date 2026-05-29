@@ -32,13 +32,9 @@ public class GrowthSubCategoryController {
 
     @PostMapping("/{id}/edit")
     public String updateSubCategory(
-
             @PathVariable Long id,
-
             @ModelAttribute GrowthSubCategoryForm subCategoryForm,
-
             RedirectAttributes redirectAttributes
-
     ) {
         subCategoryService.update(id, subCategoryForm);
         redirectAttributes.addFlashAttribute("noticeMessage", "성장 중분류가 수정되었습니다.");

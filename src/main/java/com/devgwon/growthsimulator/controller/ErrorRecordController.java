@@ -24,13 +24,9 @@ public class ErrorRecordController {
 
     @GetMapping
     public String errors(
-
             @RequestParam(required = false) ErrorStatus status,
-
             @RequestParam(required = false) String keyword,
-
             Model model
-
     ) {
         model.addAttribute("errors", errorRecordService.findList(status, keyword));
         model.addAttribute("statuses", ErrorStatus.values());
@@ -47,15 +43,10 @@ public class ErrorRecordController {
 
     @PostMapping
     public String create(
-
             @ModelAttribute("errorForm") ErrorRecordForm form,
-
             BindingResult bindingResult,
-
             Model model,
-
             RedirectAttributes redirectAttributes
-
     ) {
         if (bindingResult.hasErrors()) {
             return createForm(model);
@@ -85,17 +76,11 @@ public class ErrorRecordController {
 
     @PostMapping("/{id}/edit")
     public String update(
-
             @PathVariable Long id,
-
             @ModelAttribute("errorForm") ErrorRecordForm form,
-
             BindingResult bindingResult,
-
             Model model,
-
             RedirectAttributes redirectAttributes
-
     ) {
         if (bindingResult.hasErrors()) {
             return updateForm(id, model);

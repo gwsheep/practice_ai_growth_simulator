@@ -51,11 +51,8 @@ public class ScheduleController {
 
     @PostMapping
     public String createSchedule(
-
             @ModelAttribute("scheduleForm") ScheduleCreateRequest request,
-
             RedirectAttributes redirectAttributes
-
     ) {
         scheduleService.create(request);
         redirectAttributes.addFlashAttribute("noticeMessage", "새 일정이 등록되었습니다.");
@@ -74,13 +71,9 @@ public class ScheduleController {
 
     @PostMapping("/{id}/edit")
     public String updateSchedule(
-
             @PathVariable Long id,
-
             @ModelAttribute("scheduleForm") ScheduleUpdateRequest request,
-
             RedirectAttributes redirectAttributes
-
     ) {
         scheduleService.update(id, request);
         redirectAttributes.addFlashAttribute("noticeMessage", "일정이 수정되었습니다.");

@@ -34,11 +34,8 @@ public class ScheduleTypeController {
 
     @PostMapping
     public String create(
-
             @ModelAttribute ScheduleTypeForm scheduleTypeForm,
-
             RedirectAttributes redirectAttributes
-
     ) {
         scheduleTypeService.create(scheduleTypeForm);
         redirectAttributes.addFlashAttribute("noticeMessage", "새 일정 타입이 추가되었습니다.");
@@ -56,13 +53,9 @@ public class ScheduleTypeController {
 
     @PostMapping("/{id}/edit")
     public String update(
-
             @PathVariable Long id,
-
             @ModelAttribute ScheduleTypeForm scheduleTypeForm,
-
             RedirectAttributes redirectAttributes
-
     ) {
         scheduleTypeService.update(id, scheduleTypeForm);
         redirectAttributes.addFlashAttribute("noticeMessage", "일정 타입이 수정되었습니다.");

@@ -48,15 +48,10 @@ public class DailyReviewController {
 
     @PostMapping
     public String createReview(
-
             @ModelAttribute("reviewForm") DailyReviewCreateRequest request,
-
             BindingResult bindingResult,
-
             Model model,
-
             RedirectAttributes redirectAttributes
-
     ) {
         if (bindingResult.hasErrors()) {
             return createForm(model);
@@ -90,17 +85,11 @@ public class DailyReviewController {
 
     @PostMapping("/{id}/edit")
     public String updateReview(
-
             @PathVariable Long id,
-
             @ModelAttribute("reviewForm") DailyReviewUpdateRequest request,
-
             BindingResult bindingResult,
-
             Model model,
-
             RedirectAttributes redirectAttributes
-
     ) {
         if (bindingResult.hasErrors()) {
             return updateForm(id, model);

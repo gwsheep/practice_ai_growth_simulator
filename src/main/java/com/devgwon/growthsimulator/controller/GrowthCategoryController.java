@@ -36,11 +36,8 @@ public class GrowthCategoryController {
 
     @PostMapping
     public String createCategory(
-
             @ModelAttribute GrowthCategoryForm categoryForm,
-
             RedirectAttributes redirectAttributes
-
     ) {
         categoryService.create(categoryForm);
         redirectAttributes.addFlashAttribute("noticeMessage", "새 성장 대분류가 추가되었습니다.");
@@ -57,13 +54,9 @@ public class GrowthCategoryController {
 
     @PostMapping("/{id}/edit")
     public String updateCategory(
-
             @PathVariable Long id,
-
             @ModelAttribute GrowthCategoryForm categoryForm,
-
             RedirectAttributes redirectAttributes
-
     ) {
         categoryService.update(id, categoryForm);
         redirectAttributes.addFlashAttribute("noticeMessage", "성장 대분류가 수정되었습니다.");
@@ -94,13 +87,9 @@ public class GrowthCategoryController {
 
     @PostMapping("/{categoryId}/sub-categories")
     public String createSubCategory(
-
             @PathVariable Long categoryId,
-
             @ModelAttribute GrowthSubCategoryForm subCategoryForm,
-
             RedirectAttributes redirectAttributes
-
     ) {
         subCategoryService.create(categoryId, subCategoryForm);
         redirectAttributes.addFlashAttribute("noticeMessage", "새 성장 중분류가 추가되었습니다.");

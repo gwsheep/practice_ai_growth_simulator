@@ -28,13 +28,9 @@ public class BlogDraftController {
 
     @PostMapping("/generate")
     public String generate(
-
             @ModelAttribute("draftRequest") BlogDraftGenerateRequest request,
-
             BindingResult bindingResult,
-
             Model model
-
     ) {
         if (bindingResult.hasErrors()) {
             addFormView(model, blogDraftService.getFormView());

@@ -17,15 +17,10 @@ public class WeeklyReportController {
 
     @GetMapping("/weekly-reports")
     public String report(
-
             @RequestParam(required = false)
-
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-
             LocalDate weekStart,
-
             Model model
-
     ) {
         WeeklyReportView report = weekStart == null
                 ? weeklyReportService.getCurrentWeekReport()

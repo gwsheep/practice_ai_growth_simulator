@@ -47,15 +47,10 @@ public class MonsterController {
 
     @PostMapping
     public String createMonster(
-
             @ModelAttribute("monsterForm") MonsterCreateRequest request,
-
             BindingResult bindingResult,
-
             Model model,
-
             RedirectAttributes redirectAttributes
-
     ) {
         if (bindingResult.hasErrors()) {
             return createForm(model);
@@ -90,17 +85,11 @@ public class MonsterController {
 
     @PostMapping("/{id}/edit")
     public String updateMonster(
-
             @PathVariable Long id,
-
             @ModelAttribute("monsterForm") MonsterUpdateRequest request,
-
             BindingResult bindingResult,
-
             Model model,
-
             RedirectAttributes redirectAttributes
-
     ) {
         if (bindingResult.hasErrors()) {
             return updateForm(id, model);
@@ -117,13 +106,9 @@ public class MonsterController {
 
     @PostMapping("/{id}/attack")
     public String attackMonster(
-
             @PathVariable Long id,
-
             @ModelAttribute("attackForm") MonsterAttackRequest request,
-
             RedirectAttributes redirectAttributes
-
     ) {
         MonsterAttackResult result = monsterService.attack(id, request);
         redirectAttributes.addFlashAttribute("noticeMessage", result.message());
@@ -160,11 +145,8 @@ public class MonsterController {
     }
 
     private record GrowthSubCategoryOption(
-
             Long id,
-
             String label
-
     ) {
         static GrowthSubCategoryOption from(GrowthSubCategory subCategory) {
             return new GrowthSubCategoryOption(
