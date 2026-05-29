@@ -52,6 +52,7 @@ src/main/resources
 │   └── js
 └── templates
     ├── ai-coach
+    ├── blog-drafts
     ├── dashboard
     ├── daily-reviews
     ├── errors
@@ -139,6 +140,9 @@ AI Coach Fake Client MVP 흐름:
 - 공통 네비게이션은 `templates/fragments/navigation.html`을 사용한다.
 - Quest, Schedule, Daily Review, Weekly Report, Monster, Error Museum, Growth Settings는 각 전용 template 디렉토리를 가진다.
 - AI Coach 화면은 `templates/ai-coach/index.html`을 사용한다.
+- Blog Draft Generator 화면은 `templates/blog-drafts/index.html`을 사용한다.
+- Blog Draft Generator는 저장형 Entity 없이 `BlogDraftController -> BlogDraftService -> BlogDraftGenerator` 흐름으로 Markdown 초안을 조립한다.
+- Blog Draft Generator는 실제 AI API, 외부 네트워크 호출, API Key, OpenAI 의존성을 사용하지 않는다.
 
 ## 새 파일 위치 기준
 

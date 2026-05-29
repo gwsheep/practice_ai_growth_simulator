@@ -5,6 +5,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 사용자는 Quest를 완료하고 EXP를 얻으며, Level up하고, AI + 백엔드 개발자로서 성장한다. UI는 무거운 관리자 페이지가 아니라 백둥이가 말풍선으로 안내하는 밝고 가벼운 성장 시뮬레이터를 지향한다.
 
 현재 핵심 구조는 `DeveloperProfile`, `Quest`, `GrowthCategory`, `GrowthSubCategory`, `GrowthLog`, `Schedule`, `DailyReview`, `WeeklyReport`, `Monster`, `ErrorRecord`, `CharacterMessageService`, `Dashboard`, `AiCoachService`, Thymeleaf 기반 UI, PostgreSQL 로컬 DB를 중심으로 한다.
+Blog Draft Generator는 DailyReview, ErrorRecord, GrowthLog 기반 Markdown 초안을 템플릿으로 생성한다.
 
 성장 항목은 고정 필드가 아니라 `GrowthCategory` / `GrowthSubCategory` 기반으로 관리한다.
 
@@ -334,12 +335,22 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 
 주요 기능 후보:
 
-- 템플릿 기반 블로그 초안 생성
-- Error Museum 기반 문제 해결 글 초안
-- Daily Review 기반 회고 글 초안
-- GrowthLog 기반 학습 기록 요약
+- 템플릿 기반 블로그 초안 생성 (완료)
+- Error Museum 기반 문제 해결 글 초안 (완료)
+- Daily Review 기반 회고 글 초안 (완료)
+- GrowthLog 기반 학습 기록 요약 (완료)
 - AI Coach와 연결한 초안 개선
-- Markdown 형태 출력
+- Markdown 형태 출력 (완료)
+
+현재 완료된 범위:
+
+- `/blog-drafts` 화면 추가
+- `BlogDraftController`, `BlogDraftService`, `BlogDraftGenerator`, `TemplateBasedBlogDraftGenerator` 구조 추가
+- DailyReview/ErrorRecord/GrowthLog 후보 목록 조회
+- 선택 소스와 초안 유형 기반 Markdown textarea 출력
+- 데이터가 부족할 때 기본 안내 메시지 표시
+- 실제 AI API, 외부 네트워크 호출, API Key, OpenAI 의존성 없이 동작
+- MVP에서는 BlogDraft Entity 저장 기능을 만들지 않고 조회형/즉시 생성형으로 유지
 
 예상 Entity:
 
@@ -391,9 +402,9 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 4. Daily Review Controller/Form 통합 테스트 추가 (완료)
 5. 완료 메시지와 Dashboard flash message 흐름 보강
 6. Monster Controller/Form 통합 테스트 추가 (완료)
-7. Error Museum Controller/Form 통합 테스트 추가
+7. Error Museum Controller/Form 통합 테스트 추가 (완료)
 8. Error Museum 태그 정책 초안 작성
-9. Blog Draft Generator 템플릿 기반 초안 설계
+9. Blog Draft Generator 템플릿 기반 MVP 구현 (완료)
 10. AI Coach Fake client 설계 (완료)
 11. AI Coach Fake Client MVP 구현 (완료)
 12. Dynamic Character UI 고도화 범위 확정
@@ -443,8 +454,8 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 10. Daily Review Controller/Form 통합 테스트 (완료)
 11. Monster Controller/Form 통합 테스트 (완료)
 12. AI Coach Fake Client MVP (완료)
-13. Error Museum Controller/Form 통합 테스트
-14. Blog Draft Generator
+13. Error Museum Controller/Form 통합 테스트 (완료)
+14. Blog Draft Generator 템플릿 기반 MVP (완료)
 15. Job Class / Career Path
 16. Dynamic Character UI 고도화
 17. Growth Category Management 고도화
@@ -456,7 +467,9 @@ Codex가 한 번에 처리하기 좋은 단위로 쪼갠다.
 - Quest 완료 트랜잭션 테스트는 PostgreSQL 기반 `QuestServiceTransactionTest`에서 성공, 롤백, 중복 완료, 미존재 Quest를 검증한다.
 - Daily Review Controller/Form 통합 테스트는 PostgreSQL 기반 `DailyReviewControllerTest`에서 목록/상세/수정 폼, 생성/수정/삭제 성공, 생성/수정 validation 실패 시 form 반환을 검증한다.
 - Monster Controller/Form 통합 테스트는 PostgreSQL 기반 `MonsterControllerTest`에서 목록/상세/생성/수정 폼, 생성/수정 validation 실패 시 form 반환, 공격/처치/보관 흐름을 검증한다.
+- Error Museum Controller/Form 통합 테스트는 PostgreSQL 기반 `ErrorRecordControllerTest`에서 목록/상세/생성/수정/삭제, 해결/보관, 상태 필터, 키워드 검색, GrowthSubCategory 필수 연결, Quest 선택 연결, 생성/수정 validation 실패 시 form 반환을 검증한다.
 - AI Coach Fake Client MVP는 `/ai-coach`에서 DailyReview, Quest, GrowthLog 기반 규칙 메시지와 다음 행동 추천을 제공하며, 외부 AI API와 사용자 데이터 외부 전송은 사용하지 않는다.
+- Blog Draft Generator MVP는 `/blog-drafts`에서 DailyReview, ErrorRecord, GrowthLog 기반 템플릿 Markdown 초안을 생성하며, 실제 AI API와 외부 전송, API Key, OpenAI 의존성은 사용하지 않는다.
 - Dashboard 성장판은 전체 성장 요약, Category별 성장 카드, SubCategory 진행률, 최근 GrowthLog, 최근 완료 Quest를 표시한다.
 - 현재 Dashboard는 앱 홈형 게임 로비로 정리되어 Hero, Level/EXP, 루틴 chip, 빠른 이동 메뉴 중심으로 동작한다.
 - 전체 목록과 CRUD는 Quest, Schedule, Daily Review, Weekly Report, Monster, Error Museum, Growth Settings 각 전용 화면에서 처리한다.

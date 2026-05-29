@@ -216,6 +216,32 @@ MVP 정책:
 - AI Coach 메시지 저장 여부와 보관 기간
 - 추천 Quest를 실제 Quest 생성 흐름과 연결할지 여부
 
+## Blog Draft Generator
+
+Blog Draft Generator는 DailyReview, ErrorRecord, GrowthLog를 기반으로 사용자가 수정할 수 있는 Markdown 초안 뼈대를 만든다.
+
+MVP 정책:
+
+- 실제 AI API를 호출하지 않는다.
+- OpenAI API Key, token, 외부 네트워크 호출, OpenAI 관련 의존성을 추가하지 않는다.
+- 사용자 DailyReview/ErrorRecord/GrowthLog 데이터를 외부로 전송하지 않는다.
+- `BlogDraftService`가 화면 요청과 데이터 조회를 담당하고, Controller는 초안 생성 로직을 직접 처리하지 않는다.
+- 초안 생성은 `BlogDraftGenerator` 인터페이스와 `TemplateBasedBlogDraftGenerator`의 템플릿 조립으로 처리한다.
+- MVP에서는 BlogDraft Entity를 만들지 않고, 생성된 Markdown을 화면에서 즉시 보여준다.
+- 생성된 초안은 완성 글이 아니라 사용자가 복사한 뒤 수정하는 출발점이다.
+
+초안 유형:
+
+- Daily Review 기반 회고형 초안
+- Error Museum 기반 문제 해결형 초안
+- GrowthLog 기반 학습 기록형 초안
+
+확인 필요:
+
+- BlogDraft, BlogDraftSource, BlogDraftStatus 기반 저장형 초안을 도입할지 여부
+- 생성한 초안의 보관 기간과 수정본 버전 관리 정책
+- 실제 AI 연동 시 사용자 기록 전송 동의와 익명화 정책
+
 ## 정책 확인 필요
 
 - AI Coach의 실제 AI 연동 시 Entity와 저장 정책

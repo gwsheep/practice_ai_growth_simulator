@@ -24,6 +24,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - 조회형 Weekly Report
 - Monster 등록/공격/보관
 - Error Museum 기록/검색/해결/보관
+- Blog Draft Generator 템플릿 기반 Markdown 초안 생성
 - Fake/Rule 기반 백둥이 AI Coach 화면
 
 AI Coach MVP는 실제 AI API를 호출하지 않으며, 사용자 기록을 외부로 전송하지 않습니다. 현재는 Daily Review, Quest, GrowthLog 기반 규칙 메시지만 제공합니다.

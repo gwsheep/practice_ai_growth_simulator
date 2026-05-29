@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blog Draft Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/game-ui.css}">
+</head>
+<body>
+<main class="container page-shell app-shell py-4">
+    <nav th:replace="~{fragments/navigation :: nav('blog-drafts')}"></nav>
+
+    <section class="game-hero mb-4">
+        <div class="mascot-panel">
+            <div class="office-character" aria-hidden="true">
+                <span class="office-character__body"></span>
+                <span class="office-character__shirt"></span>
+                <span class="office-character__tie"></span>
+                <span class="office-character__badge">백</span>
+                <span class="office-character__head"></span>
+                <span class="office-character__hair"></span>
+                <span class="office-character__eye office-character__eye--left"></span>
+                <span class="office-character__eye office-character__eye--right"></span>
+                <span class="office-character__mouth"></span>
+            </div>
+            <div>
+                <span class="game-hero__eyebrow">BLOG DRAFT MVP</span>
+                <p class="speech-bubble mb-2">완성 글이 아니라, 네 기록을 꺼내 초안 뼈대를 만들어줄게요.</p>
+                <h1 class="h3 mb-1">Blog Draft Generator</h1>
+                <p class="text-muted mb-0">외부 AI API 없이 Daily Review, Error Museum, GrowthLog만으로 Markdown 초안을 만듭니다.</p>
+            </div>
+        </div>
+        <div class="game-hero__stats">
+            <article class="stat-card">
+                <span>Draft Mode</span>
+                <strong>Template</strong>
+                <small>외부 전송 없음</small>
+            </article>
+            <a class="action-button" th:href="@{/daily-reviews/new}">회고 남기기</a>
+        </div>
+    </section>
+
+    <div th:if="${empty}" class="alert alert-info">
+        아직 초안으로 만들 기록이 적어요. Daily Review를 작성하거나 Quest를 완료하고, 에러 수집품을 남겨보세요.
+    </div>
+
+    <section class="row g-3 mb-4">
+        <div class="col-12 col-lg-5">
+            <article class="soft-card h-100">
+                <h2 class="section-title mb-3">초안 생성</h2>
+                <form class="quest-form" th:object="${draftRequest}" th:action="@{/blog-drafts/generate}" method="post">
+                    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-warning">
+                        <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}">입력값을 확인해 주세요.</p>
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="sourceType">초안 생성 소스</label>
+                        <select class="form-select" id="sourceType" th:field="*{sourceType}">
+                            <option th:each="sourceType : ${sourceTypes}"
+                                    th:value="${sourceType}"
+                                    th:text="${sourceType.label}">Daily Review</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="draftType">초안 유형</label>
+                        <select class="form-select" id="draftType" th:field="*{draftType}">
+                            <option th:each="draftType : ${draftTypes}"
+                                    th:value="${draftType}"
+                                    th:text="${draftType.label}">회고형</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="sourceId">세부 기록</label>
+                        <select class="form-select" id="sourceId" th:field="*{sourceId}">
+                            <option value="">가장 최근 기록 사용</option>
+                            <optgroup label="Daily Review" th:if="${!#lists.isEmpty(dailyReviewOptions)}">
+                                <option th:each="option : ${dailyReviewOptions}"
+                                        th:value="${option.id}"
+                                        th:text="${option.label}">2026.05.29 회고</option>
+                            </optgroup>
+                            <optgroup label="Error Record" th:if="${!#lists.isEmpty(errorRecordOptions)}">
+                                <option th:each="option : ${errorRecordOptions}"
+                                        th:value="${option.id}"
+                                        th:text="${option.label}">에러 기록</option>
+                            </optgroup>
+                        </select>
+                        <p class="text-muted small mt-2 mb-0">GrowthLog는 최근 5개 기록을 묶어서 학습 기록형 초안으로 만듭니다.</p>
+                    </div>
+
+                    <button class="action-button" type="submit">Markdown 초안 생성</button>
+                </form>
+            </article>
+        </div>
+
+        <div class="col-12 col-lg-7">
+            <article class="game-card h-100">
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 class="section-title mb-1" th:text="${draft.title}">아직 초안이 없습니다.</h2>
+                        <p class="text-muted small mb-0">
+                            <span th:text="${draft.sourceLabel}">선택한 소스 없음</span>
+                            <span> · </span>
+                            <span th:text="${draft.draftTypeLabel}">템플릿</span>
+                        </p>
+                    </div>
+                    <span class="level-badge">Markdown</span>
+                </div>
+
+                <div th:if="${draft.empty}" class="empty-state" th:text="${draft.guideMessage}">
+                    초안 생성 소스와 유형을 선택하면 Markdown 초안을 만들 수 있어요.
+                </div>
+
+                <div th:unless="${draft.empty}">
+                    <p class="text-muted small" th:text="${draft.guideMessage}">생성 안내</p>
+                    <textarea class="form-control font-monospace" rows="22" readonly th:text="${draft.markdown}"># Markdown</textarea>
+                    <p class="text-muted small mt-2 mb-0">이 초안은 그대로 발행하기보다 복사해서 블로그 편집기에서 문장을 다듬는 용도입니다.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="soft-card">
+        <h2 class="section-title mb-3">소스 상태</h2>
+        <div class="stat-grid">
+            <article class="stat-card">
+                <span>Daily Review</span>
+                <strong th:text="${#lists.size(dailyReviewOptions)}">0</strong>
+                <small>회고형 초안</small>
+            </article>
+            <article class="stat-card">
+                <span>Error Record</span>
+                <strong th:text="${#lists.size(errorRecordOptions)}">0</strong>
+                <small>문제 해결형 초안</small>
+            </article>
+            <article class="stat-card">
+                <span>GrowthLog</span>
+                <strong th:text="${#lists.size(growthLogOptions)}">0</strong>
+                <small>최근 5개 기준</small>
+            </article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

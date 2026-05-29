@@ -30,6 +30,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - 조회형 Weekly Report
 - Monster 목록/등록/상세/수정/수동 공격/보관
 - Error Museum 목록/등록/상세/수정/해결/보관/삭제
+- Blog Draft Generator 템플릿 기반 Markdown 초안 생성
 - AI Coach Fake Client MVP 화면
 - 공통 게임형 네비게이션 fragment
 - `game-ui.css`, `dashboard.css`, `dashboard.js`, `quest-form.js`
@@ -50,6 +51,7 @@ Developer Growth Simulator는 개발자의 공부, 업무, 회고, 이직 준비
 - `/weekly-reports`, `/weekly-reports/current`
 - `/monsters`, `/monsters/new`, `/monsters/{id}`, `/monsters/{id}/edit`
 - `/errors`, `/errors/new`, `/errors/{id}`, `/errors/{id}/edit`
+- `/blog-drafts`: 템플릿 기반 블로그 초안 생성
 - `/ai-coach`: 백둥이 AI Coach
 
 ## MVP 범위

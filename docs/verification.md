@@ -95,6 +95,7 @@ http://localhost:8080/dashboard
 - `/monsters/new`
 - `/errors`
 - `/errors/new`
+- `/blog-drafts`
 - `/ai-coach`
 
 핵심 흐름:
@@ -116,6 +117,7 @@ http://localhost:8080/dashboard
 - Monster 등록/수정/수동 공격/보관
 - ErrorRecord 등록/수정/해결/보관/삭제
 - Error Museum 상태 필터와 검색
+- Blog Draft Generator DailyReview/ErrorRecord/GrowthLog 기반 Markdown 초안 생성
 - AI Coach 최근 성장 요약, 회고 요약, 응원 메시지, 다음 행동 추천 표시
 
 ## 화면 변경 시 확인할 항목
@@ -185,11 +187,16 @@ server:
 - Quest 완료 트랜잭션 테스트 추가
 - Daily Review Controller/Form 통합 테스트 추가
 - Monster Controller/Form 통합 테스트 추가
+- Error Museum Controller/Form 통합 테스트 추가
 - AI Coach Fake Client MVP Service/Controller 테스트 추가
+- Blog Draft Generator MVP Service/Controller 테스트 추가
 
 최근 문서 반영 시점의 검증 기록:
 
 - `./gradlew clean test` 성공
+- `./gradlew test --tests com.devgwon.growthsimulator.controller.ErrorRecordControllerTest` 성공
+- `./gradlew test --tests com.devgwon.growthsimulator.service.BlogDraftServiceTest --tests com.devgwon.growthsimulator.controller.BlogDraftControllerTest` 성공
+- `./gradlew bootRun` 후 `/blog-drafts` HTTP 200 확인
 - 실행 중 `/usr/lib/jvm/openjdk-21` 경로가 유효하지 않다는 Gradle 경고가 표시되었으나 테스트는 통과함
 
 이 기록은 과거 시점의 검증 결과다. 현재 상태에서 릴리스 또는 큰 변경 전에는 다시 실행해 확인한다.

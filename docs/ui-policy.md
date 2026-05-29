@@ -57,6 +57,7 @@ Dashboard 중심 정보:
 - Weekly Report: 데이터가 없어도 빈 화면 대신 안내 메시지를 제공한다.
 - Monster: HP, 상태, 난이도가 전투장 느낌으로 보이게 한다.
 - Error Museum: 실패 기록이 아니라 해결 수집품처럼 보이게 한다.
+- Blog Draft Generator: 완성 글 생성기가 아니라 수정 가능한 Markdown 초안 도구로 보이게 하고, 외부 전송 없는 템플릿 기반 MVP임을 간결하게 안내한다.
 - AI Coach: 백둥이 말풍선, 최근 성장 요약, 최근 회고 요약, 응원 메시지, 다음 행동 추천을 가볍게 보여준다.
 
 ## 디자인 주의사항
@@ -67,6 +68,7 @@ Dashboard 중심 정보:
 - 캐릭터와 말풍선은 기능 안내자이자 성장 피드백의 중심으로 유지한다.
 - 새 UI를 추가할 때 기존 `game-ui.css`, `dashboard.css`, 공통 fragment와 충돌하지 않게 한다.
 - AI Coach 화면은 실제 AI 채팅처럼 보이게 과장하지 않고, 현재 Fake/Rule 기반 MVP임을 전제로 간결한 코칭 화면으로 유지한다.
+- Blog Draft Generator 화면은 AI 작성 도구처럼 과장하지 않고, 사용자가 복사해 다듬을 Markdown textarea와 데이터 부족 안내를 중심으로 둔다.
 
 ## 확인 필요
 

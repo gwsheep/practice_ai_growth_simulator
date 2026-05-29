@@ -7,6 +7,7 @@ import com.devgwon.growthsimulator.service.ErrorRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,10 +50,23 @@ public class ErrorRecordController {
 
             @ModelAttribute("errorForm") ErrorRecordForm form,
 
+            BindingResult bindingResult,
+
+            Model model,
+
             RedirectAttributes redirectAttributes
 
     ) {
-        Long id = errorRecordService.create(form).getId();
+        if (bindingResult.hasErrors()) {
+            return createForm(model);
+        }
+        Long id;
+        try {
+            id = errorRecordService.create(form).getId();
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("errorRecord.invalid", exception.getMessage());
+            return createForm(model);
+        }
         redirectAttributes.addFlashAttribute("noticeMessage", "새 에러 수집품을 박물관에 올렸어요.");
         return "redirect:/errors/" + id;
     }
@@ -76,10 +90,22 @@ public class ErrorRecordController {
 
             @ModelAttribute("errorForm") ErrorRecordForm form,
 
+            BindingResult bindingResult,
+
+            Model model,
+
             RedirectAttributes redirectAttributes
 
     ) {
-        errorRecordService.update(id, form);
+        if (bindingResult.hasErrors()) {
+            return updateForm(id, model);
+        }
+        try {
+            errorRecordService.update(id, form);
+        } catch (IllegalArgumentException exception) {
+            bindingResult.reject("errorRecord.invalid", exception.getMessage());
+            return updateForm(id, model);
+        }
         redirectAttributes.addFlashAttribute("noticeMessage", "에러 기록을 수정했습니다.");
         return "redirect:/errors/" + id;
     }
@@ -109,6 +135,26 @@ public class ErrorRecordController {
         model.addAttribute("errorForm", formView.form());
         model.addAttribute("editMode", formView.editMode());
         model.addAttribute("errorRecordId", formView.errorRecordId());
+        addFormOptions(model, formView);
+    }
+
+    private String createForm(Model model) {
+        ErrorRecordFormView formView = errorRecordService.createFormView();
+        model.addAttribute("editMode", false);
+        model.addAttribute("errorRecordId", null);
+        addFormOptions(model, formView);
+        return "errors/form";
+    }
+
+    private String updateForm(Long id, Model model) {
+        ErrorRecordFormView formView = errorRecordService.updateFormView(id);
+        model.addAttribute("editMode", true);
+        model.addAttribute("errorRecordId", id);
+        addFormOptions(model, formView);
+        return "errors/form";
+    }
+
+    private void addFormOptions(Model model, ErrorRecordFormView formView) {
         model.addAttribute("statuses", formView.statuses());
         model.addAttribute("severities", formView.severities());
         model.addAttribute("growthSubCategories", formView.growthSubCategories());
